@@ -9,11 +9,5 @@ export const Route = createFileRoute("/(protected)")({
     }
     return { auth: session };
   },
-  component: ProtectedLayout,
+  component: () => <Outlet />,
 });
-
-function ProtectedLayout() {
-  const { auth } = Route.useRouteContext();
-
-  return <Outlet />
-}
