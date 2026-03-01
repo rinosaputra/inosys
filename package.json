@@ -4,6 +4,9 @@
     "url": "https://github.com/rinosaputra/inosys/issues"
   },
   "dependencies": {
+    "@orpc/client": "^1.13.5",
+    "@orpc/server": "^1.13.5",
+    "@orpc/tanstack-query": "^1.13.5",
     "@tailwindcss/vite": "^4.1.18",
     "@tanstack/react-devtools": "^0.7.0",
     "@tanstack/react-router": "^1.132.0",
