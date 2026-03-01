@@ -10,6 +10,8 @@ import {
 import { Input } from "@/components/ui/input"
 import { createMeta, type CreateMetaInput } from "#/lib/seo";
 import { SITE_TITLE, SITE_URL } from "#/lib/site";
+import { PasswordInput } from "#/components/password";
+import z from "zod";
 
 const metadata: CreateMetaInput = {
   title: `Login - ${SITE_TITLE}`,
@@ -24,13 +26,22 @@ export const Route = createFileRoute("/(auth)/login")({
   head: () => createMeta(metadata),
 });
 
+const LoginSchema = z.object({
+  email: z.email(),
+  password: z.string().min(8),
+})
+
+type LoginInput = z.infer<typeof LoginSchema>;
+
 function LoginPage() {
   return (<form className="flex flex-col gap-6">
     <FieldGroup>
       <div className="flex flex-col items-center gap-1 text-center">
-        <h1 className="text-2xl font-bold">Login to your account</h1>
+        <h1 className="text-2xl font-bold">
+          Welcome back to {SITE_TITLE}
+        </h1>
         <p className="text-muted-foreground text-sm text-balance">
-          Enter your email below to login to your account
+          Enter your email and password to access your account.
         </p>
       </div>
       <Field>
@@ -48,7 +59,7 @@ function LoginPage() {
             Forgot your password?
           </Link>
         </div>
-        <Input id="password" type="password" required />
+        <PasswordInput id="password" required />
       </Field>
       <Field>
         <Button type="submit">Login</Button>
