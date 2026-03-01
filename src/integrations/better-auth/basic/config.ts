@@ -1,7 +1,7 @@
+import { connection } from "#/lib/connection";
 import type { BetterAuthOptions } from "better-auth";
 import { createPool } from "mysql2/promise";
 
-import { connection } from "#/integrations/knex";
 
 export const betterAuthBasicConfig: BetterAuthOptions = {
   database: createPool({
