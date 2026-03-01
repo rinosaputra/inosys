@@ -14,6 +14,7 @@ import { Route as publicRouteRouteImport } from './routes/(public)/route'
 import { Route as publicIndexRouteImport } from './routes/(public)/index'
 import { Route as publicAboutRouteImport } from './routes/(public)/about'
 import { Route as publicBlogIndexRouteImport } from './routes/(public)/blog.index'
+import { Route as ApiRpcSplatRouteImport } from './routes/api.rpc.$'
 import { Route as publicBlogSlugRouteImport } from './routes/(public)/blog.$slug'
 
 const RssDotxmlRoute = RssDotxmlRouteImport.update({
@@ -40,6 +41,11 @@ const publicBlogIndexRoute = publicBlogIndexRouteImport.update({
   path: '/blog/',
   getParentRoute: () => publicRouteRoute,
 } as any)
+const ApiRpcSplatRoute = ApiRpcSplatRouteImport.update({
+  id: '/api/rpc/$',
+  path: '/api/rpc/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const publicBlogSlugRoute = publicBlogSlugRouteImport.update({
   id: '/blog/$slug',
   path: '/blog/$slug',
@@ -51,6 +57,7 @@ export interface FileRoutesByFullPath {
   '/about': typeof publicAboutRoute
   '/': typeof publicIndexRoute
   '/blog/$slug': typeof publicBlogSlugRoute
+  '/api/rpc/$': typeof ApiRpcSplatRoute
   '/blog/': typeof publicBlogIndexRoute
 }
 export interface FileRoutesByTo {
@@ -58,6 +65,7 @@ export interface FileRoutesByTo {
   '/about': typeof publicAboutRoute
   '/': typeof publicIndexRoute
   '/blog/$slug': typeof publicBlogSlugRoute
+  '/api/rpc/$': typeof ApiRpcSplatRoute
   '/blog': typeof publicBlogIndexRoute
 }
 export interface FileRoutesById {
@@ -67,13 +75,20 @@ export interface FileRoutesById {
   '/(public)/about': typeof publicAboutRoute
   '/(public)/': typeof publicIndexRoute
   '/(public)/blog/$slug': typeof publicBlogSlugRoute
+  '/api/rpc/$': typeof ApiRpcSplatRoute
   '/(public)/blog/': typeof publicBlogIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/rss.xml' | '/about' | '/' | '/blog/$slug' | '/blog/'
+  fullPaths:
+    | '/rss.xml'
+    | '/about'
+    | '/'
+    | '/blog/$slug'
+    | '/api/rpc/$'
+    | '/blog/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/rss.xml' | '/about' | '/' | '/blog/$slug' | '/blog'
+  to: '/rss.xml' | '/about' | '/' | '/blog/$slug' | '/api/rpc/$' | '/blog'
   id:
     | '__root__'
     | '/(public)'
@@ -81,12 +96,14 @@ export interface FileRouteTypes {
     | '/(public)/about'
     | '/(public)/'
     | '/(public)/blog/$slug'
+    | '/api/rpc/$'
     | '/(public)/blog/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   publicRouteRoute: typeof publicRouteRouteWithChildren
   RssDotxmlRoute: typeof RssDotxmlRoute
+  ApiRpcSplatRoute: typeof ApiRpcSplatRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -126,6 +143,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof publicBlogIndexRouteImport
       parentRoute: typeof publicRouteRoute
     }
+    '/api/rpc/$': {
+      id: '/api/rpc/$'
+      path: '/api/rpc/$'
+      fullPath: '/api/rpc/$'
+      preLoaderRoute: typeof ApiRpcSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/(public)/blog/$slug': {
       id: '/(public)/blog/$slug'
       path: '/blog/$slug'
@@ -157,6 +181,7 @@ const publicRouteRouteWithChildren = publicRouteRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   publicRouteRoute: publicRouteRouteWithChildren,
   RssDotxmlRoute: RssDotxmlRoute,
+  ApiRpcSplatRoute: ApiRpcSplatRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
