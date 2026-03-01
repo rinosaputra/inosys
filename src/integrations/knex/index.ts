@@ -5,7 +5,7 @@ export const connection = z
     host: z.string().nonempty(),
     port: z.number().int().positive(),
     user: z.string().nonempty(),
-    password: z.string().nonempty(),
+    password: z.string(),
     database: z.string().nonempty(),
   })
   .parse({
