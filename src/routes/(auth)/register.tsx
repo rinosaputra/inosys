@@ -17,38 +17,42 @@ import { SITE_TITLE, SITE_URL } from "#/lib/site";
 import { PasswordInput } from "#/components/password";
 import { toast } from "sonner";
 import { authClient } from "#/lib/auth-client";
+import { passwordConfirmationSchema } from "#/components/password/schema";
 
 const metadata: CreateMetaInput = {
-  title: `Login - ${SITE_TITLE}`,
-  description: `Login to your ${SITE_TITLE} account to access your dashboard and manage your settings.`,
-  url: `${SITE_URL}/login`,
+  title: `Register - ${SITE_TITLE}`,
+  description: `Register for a ${SITE_TITLE} account to access your dashboard and manage your settings.`,
+  url: `${SITE_URL}/register`,
   ogType: "website",
   twitterCard: "summary_large_image",
 }
 
-export const Route = createFileRoute("/(auth)/login")({
-  component: LoginPage,
+export const Route = createFileRoute("/(auth)/register")({
+  component: RegisterPage,
   head: () => createMeta(metadata),
 });
 
-const LoginSchema = z.object({
-  email: z.email("Please enter a valid email address."),
-  password: z.string().nonempty("Please enter your password."),
-})
+const RegisterSchema = z.object({
+  name: z.string().nonempty("Please enter your name."),
+  email: z.email("Please enter a valid email address.")
+}).and(passwordConfirmationSchema)
 
-function LoginPage() {
+function RegisterPage() {
   const form = useForm({
     validators: {
-      onSubmit: LoginSchema
+      onSubmit: RegisterSchema
     },
     defaultValues: {
+      name: "",
       email: "",
       password: "",
+      confirmPassword: "",
     },
     onSubmit({ value }) {
       toast.promise(
         async () => {
-          const response = await authClient.signIn.email({
+          const response = await authClient.signUp.email({
+            name: value.name,
             email: value.email,
             password: value.password,
             callbackURL: `${SITE_URL}/dashboard`,
@@ -59,12 +63,12 @@ function LoginPage() {
           return response
         },
         {
-          loading: "Logging in...",
+          loading: "Registering...",
           success: () => {
-            return "Login successful!"
+            return "Register successful!"
           },
           error: e => {
-            return e instanceof Error ? e.message : "An error occurred during login."
+            return e instanceof Error ? e.message : "An error occurred during register."
           },
         }
       )
@@ -78,12 +82,39 @@ function LoginPage() {
     <FieldGroup>
       <div className="flex flex-col items-center gap-1 text-center">
         <h1 className="text-2xl font-bold">
-          Welcome back to {SITE_TITLE}
+          Welcome to {SITE_TITLE}
         </h1>
         <p className="text-muted-foreground text-sm text-balance">
-          Enter your email and password to access your account.
+          Enter your email and password to create your account.
         </p>
       </div>
+      {/* Name Input */}
+      <form.Field
+        name="name"
+        children={(field) => {
+          const isInvalid =
+            field.state.meta.isTouched && !field.state.meta.isValid
+          return (
+            <Field data-invalid={isInvalid}>
+              <FieldLabel htmlFor={field.name}>Name</FieldLabel>
+              <Input
+                id={field.name}
+                name={field.name}
+                value={field.state.value}
+                onBlur={field.handleBlur}
+                onChange={(e) => field.handleChange(e.target.value)}
+                aria-invalid={isInvalid}
+                placeholder="Enter your name"
+                autoComplete="off"
+                type="text"
+              />
+              {isInvalid && (
+                <FieldError errors={field.state.meta.errors} />
+              )}
+            </Field>
+          )
+        }}
+      />
       {/* Email Input */}
       <form.Field
         name="email"
@@ -119,16 +150,7 @@ function LoginPage() {
             field.state.meta.isTouched && !field.state.meta.isValid
           return (
             <Field data-invalid={isInvalid}>
-              <div className="flex items-center">
-                <FieldLabel htmlFor={field.name}>Password</FieldLabel>
-                {/* @ts-ignore */}
-                <Link
-                  href="/forgot-password"
-                  className="ml-auto text-sm underline-offset-4 hover:underline"
-                >
-                  Forgot your password?
-                </Link>
-              </div>
+              <FieldLabel htmlFor={field.name}>Password</FieldLabel>
               <PasswordInput
                 id={field.name}
                 name={field.name}
@@ -137,6 +159,34 @@ function LoginPage() {
                 onChange={(e) => field.handleChange(e.target.value)}
                 aria-invalid={isInvalid}
                 placeholder="Enter your password"
+                autoComplete="off"
+                showStrength
+                showStrengthFeedback
+              />
+              {isInvalid && (
+                <FieldError errors={field.state.meta.errors} />
+              )}
+            </Field>
+          )
+        }}
+      />
+      {/* Confirm Password Input */}
+      <form.Field
+        name="confirmPassword"
+        children={(field) => {
+          const isInvalid =
+            field.state.meta.isTouched && !field.state.meta.isValid
+          return (
+            <Field data-invalid={isInvalid}>
+              <FieldLabel htmlFor={field.name}>Confirm Password</FieldLabel>
+              <PasswordInput
+                id={field.name}
+                name={field.name}
+                value={field.state.value}
+                onBlur={field.handleBlur}
+                onChange={(e) => field.handleChange(e.target.value)}
+                aria-invalid={isInvalid}
+                placeholder="Confirm your password"
                 autoComplete="off"
               />
               {isInvalid && (
@@ -147,18 +197,18 @@ function LoginPage() {
         }}
       />
       <Field>
-        <Button type="submit">Login</Button>
+        <Button type="submit">Register</Button>
       </Field>
       <FieldSeparator>Or continue with</FieldSeparator>
       <Field>
         <Button variant="outline" type="button">
-          Login with Google
+          Register with Google
         </Button>
         <FieldDescription className="text-center">
           Don&apos;t have an account?{" "}
           {/* @ts-ignore */}
-          <Link href="/register" className="underline underline-offset-4">
-            Sign up
+          <Link href="/login" className="underline underline-offset-4">
+            Sign in
           </Link>
         </FieldDescription>
       </Field>
