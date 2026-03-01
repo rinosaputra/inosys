@@ -8,3 +8,5 @@ export const auth = betterAuth({
 
   plugins: [tanstackStartCookies()],
 })
+
+export type Auth = (typeof auth)['$Infer'];
