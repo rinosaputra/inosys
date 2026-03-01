@@ -1,6 +1,6 @@
 import z from "zod";
 
-const connection = z
+export const connection = z
   .object({
     host: z.string().nonempty(),
     port: z.number().int().positive(),
