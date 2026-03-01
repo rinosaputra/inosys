@@ -2,6 +2,8 @@ import { HeadContent, Scripts, createRootRoute } from '@tanstack/react-router'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { TanStackDevtools } from '@tanstack/react-devtools'
 
+import TanStackFormDevtools from '#/integrations/tanstack-form/devtools'
+
 import appCss from '../styles.css?url'
 import { SITE_TITLE } from '#/lib/site'
 
@@ -49,6 +51,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
               name: 'Tanstack Router',
               render: <TanStackRouterDevtoolsPanel />,
             },
+            TanStackFormDevtools
           ]}
         />
         <Scripts />
