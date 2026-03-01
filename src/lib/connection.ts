@@ -10,9 +10,9 @@ export const connection = z
     database: z.string().nonempty(),
   })
   .parse({
-    host: import.meta.env.DB_HOST,
-    port: Number(import.meta.env.DB_PORT),
-    user: import.meta.env.DB_USER,
-    password: import.meta.env.DB_PASSWORD,
-    database: import.meta.env.DB_NAME,
+    host: process.env.DB_HOST,
+    port: Number(process.env.DB_PORT),
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
   });
