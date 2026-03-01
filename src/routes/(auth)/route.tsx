@@ -1,3 +1,4 @@
+import { SITE_TITLE } from "#/lib/site";
 import { createFileRoute, Link, Outlet } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/(auth)")({
@@ -17,7 +18,7 @@ export function AuthLayout() {
               className="size-4"
             />
           </div>
-          {import.meta.env.VITE_APP_NAME}
+          {SITE_TITLE}
         </Link  >
       </div>
       <div className="flex flex-1 items-center justify-center">
