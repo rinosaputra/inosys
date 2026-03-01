@@ -1,4 +1,4 @@
-export const SITE_TITLE = 'TanStack Start'
+export const SITE_TITLE = 'Inosys'
 export const SITE_DESCRIPTION =
-  'A tropical, breathable app starter with full-document SSR, server functions, streaming, and type-safe routing.'
-export const SITE_URL = 'https://example.com'
+  'Inosys is a software consultancy specializing in building high-quality web applications using modern technologies and best practices. We are passionate about creating performant, scalable, and maintainable solutions that help our clients achieve their business goals.'
+export const SITE_URL = 'https://inosys.dev'

@@ -5,13 +5,13 @@ import { SITE_DESCRIPTION, SITE_TITLE, SITE_URL } from '#/lib/site'
 const canonical = `${SITE_URL}/blog`
 const pageTitle = `Blog | ${SITE_TITLE}`
 
-export const Route = createFileRoute('/blog/')({
+export const Route = createFileRoute('/(public)/blog/')({
   head: () => ({
     links: [{ rel: 'canonical', href: canonical }],
     meta: [
       { title: pageTitle },
       { name: 'description', content: SITE_DESCRIPTION },
-      { property: 'og:image', content: `${SITE_URL}/images/lagoon-1.svg` },
+      { property: 'og:image', content: '${SITE_URL}/images/lagoon-1.svg' },
     ],
   }),
   component: BlogIndex,

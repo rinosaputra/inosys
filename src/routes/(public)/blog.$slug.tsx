@@ -2,10 +2,10 @@ import { createFileRoute, notFound } from '@tanstack/react-router'
 import { MDXContent } from '@content-collections/mdx/react'
 import { allBlogs } from 'content-collections'
 import { SITE_URL } from '#/lib/site'
-import { MdxCallout } from '#/components/MdxCallout'
-import { MdxMetrics } from '#/components/MdxMetrics'
+import { MdxCallout } from './-components/MdxCallout'
+import { MdxMetrics } from './-components/MdxMetrics'
 
-export const Route = createFileRoute('/blog/$slug')({
+export const Route = createFileRoute('/(public)/blog/$slug')({
   loader: ({ params }) => {
     const post = Array.from(
       new Map(
