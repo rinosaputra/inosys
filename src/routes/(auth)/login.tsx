@@ -8,7 +8,7 @@ import {
   FieldSeparator,
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import type { CreateMetaInput } from "#/lib/seo";
+import { createMeta, type CreateMetaInput } from "#/lib/seo";
 import { SITE_TITLE, SITE_URL } from "#/lib/site";
 
 const metadata: CreateMetaInput = {
@@ -21,6 +21,7 @@ const metadata: CreateMetaInput = {
 
 export const Route = createFileRoute("/(auth)/login")({
   component: LoginPage,
+  head: () => createMeta(metadata),
 });
 
 function LoginPage() {
