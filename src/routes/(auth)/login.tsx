@@ -1,4 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import z from "zod";
+import { useForm } from "@tanstack/react-form"
+
 import { Button } from "@/components/ui/button"
 import {
   Field,
@@ -11,7 +14,6 @@ import { Input } from "@/components/ui/input"
 import { createMeta, type CreateMetaInput } from "#/lib/seo";
 import { SITE_TITLE, SITE_URL } from "#/lib/site";
 import { PasswordInput } from "#/components/password";
-import z from "zod";
 
 const metadata: CreateMetaInput = {
   title: `Login - ${SITE_TITLE}`,
@@ -34,6 +36,8 @@ const LoginSchema = z.object({
 type LoginInput = z.infer<typeof LoginSchema>;
 
 function LoginPage() {
+  const form = useForm
+
   return (<form className="flex flex-col gap-6">
     <FieldGroup>
       <div className="flex flex-col items-center gap-1 text-center">
