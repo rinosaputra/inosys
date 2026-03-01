@@ -95,6 +95,7 @@
     "format": "prettier --check .",
     "lint": "eslint",
     "preview": "vite preview",
+    "start": "node --env-file=.env .output/server/index.mjs",
     "test": "vitest run"
   },
   "type": "module"
