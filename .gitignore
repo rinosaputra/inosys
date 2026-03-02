@@ -13,3 +13,4 @@ __unconfig*
 .content-collections
 todos.json
 routeTree.gen.ts
+.vercel
