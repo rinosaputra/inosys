@@ -23,38 +23,53 @@ import {
 } from "#/components/ui/dropdown-menu"
 import type { Auth } from "#/lib/auth"
 import { Button } from "#/components/ui/button"
+import { memo } from "react"
+import { toast } from "sonner"
+import { authClient } from "#/lib/auth-client"
+import { cn } from "#/lib/utils"
 
-function AvatarUser({
+const AvatarUser = memo(({
   user,
-}: Auth['Session']) {
+  autoHide = false,
+}: Auth['Session'] & { autoHide?: boolean }) => {
   const initials = user.name?.split(' ').map((n) => n[0]).join('').toUpperCase() || 'NN'
-  return (<Avatar className="size-8 rounded-lg">
-    {user.image && <AvatarImage src={user.image} alt={user.name} />}
-    <AvatarFallback className="rounded-lg">{initials}</AvatarFallback>
-  </Avatar>)
-}
+  return (<>
+    <Avatar className="size-8 rounded-lg">
+      {user.image && <AvatarImage src={user.image} alt={user.name} />}
+      <AvatarFallback className="rounded-lg">{initials}</AvatarFallback>
+    </Avatar>
+    <div className={cn("flex-1 text-left text-sm leading-tight max-w-32", autoHide ? "hidden sm:grid" : "grid")}>
+      <span className="truncate font-medium">{user.name}</span>
+      <span className="truncate text-xs">{user.email}</span>
+    </div>
+  </>)
+})
 
 function SignOutButton() {
-  return (<DropdownMenuItem>
+  const handleSignOut = () => {
+    toast.promise(authClient.signOut(), {
+      loading: "Signing out...",
+      success: "Signed out successfully",
+      error: "Failed to sign out",
+    })
+  }
+  return (<DropdownMenuItem onClick={handleSignOut}>
     <LogOut />
     Log out
   </DropdownMenuItem>)
 }
 
-export function NavUser(props: Auth['Session']) {
+export function NavUser(props: Auth['Session'] & { autoHide?: boolean }) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button
           size="lg"
           className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+          variant={'ghost'}
         >
-          <AvatarUser {...props} />
-          <div className="grid flex-1 text-left text-sm leading-tight">
-            <span className="truncate font-medium">{props.user.name}</span>
-            <span className="truncate text-xs">{props.user.email}</span>
-          </div>
-          <ChevronsUpDown className="ml-auto size-4" />
+          <AvatarUser {...props} autoHide />
+          <ChevronsUpDown className={cn("ml-auto size-4 hidden sm:inline-block")} />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent
@@ -66,10 +81,6 @@ export function NavUser(props: Auth['Session']) {
         <DropdownMenuLabel className="p-0 font-normal">
           <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
             <AvatarUser {...props} />
-            <div className="grid flex-1 text-left text-sm leading-tight">
-              <span className="truncate font-medium">{props.user.name}</span>
-              <span className="truncate text-xs">{props.user.email}</span>
-            </div>
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />

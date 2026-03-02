@@ -11,12 +11,15 @@ function SiteHeader({ children }: React.PropsWithChildren) {
       <div className="flex h-(--header-height) w-full items-center gap-2 px-4">
         <Button
           variant="ghost"
-          size="icon-sm"
+          size="sm"
           onClick={toggleSidebar}
         >
           <SidebarIcon />
+          <span className="block sm:hidden">
+            Menu
+          </span>
         </Button>
-        <Separator orientation="vertical" className="mr-2 h-4" />
+        <Separator orientation="vertical" className="mx-2 h-4" />
         {children}
       </div>
     </header>)
