@@ -5,7 +5,7 @@ export const Route = createFileRoute("/(protected)")({
   beforeLoad: async () => {
     const session = await getSession();
     if (!session) {
-      throw redirect({ to: "/login" });
+      throw redirect({ to: import.meta.env.VITE_AUTH_LOGIN_URL || '/login' });
     }
     return { auth: session };
   },
