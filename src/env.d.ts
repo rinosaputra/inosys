@@ -4,6 +4,10 @@ interface ImportMetaEnv {
   // Client-side environment variables
   readonly VITE_APP_NAME: string
   readonly VITE_SITE_URL: string
+
+  // Auth URLs
+  readonly VITE_AUTH_LOGIN_URL: string
+  readonly VITE_IS_AUTH_URL: string
 }
 
 interface ImportMeta {
