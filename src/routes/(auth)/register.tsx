@@ -55,7 +55,6 @@ function RegisterPage() {
             name: value.name,
             email: value.email,
             password: value.password,
-            callbackURL: `${SITE_URL}/dashboard`,
           })
           if (response.error) {
             throw new Error(response.error.message)

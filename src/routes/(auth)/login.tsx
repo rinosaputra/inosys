@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { createMeta, type CreateMetaInput } from "#/lib/seo";
-import { SITE_TITLE, SITE_URL } from "#/lib/site";
+import { AUTH_IS_AUTH_URL, SITE_TITLE, SITE_URL } from "#/lib/site";
 import { PasswordInput } from "#/components/password";
 import { toast } from "sonner";
 import { authClient } from "#/lib/auth-client";
@@ -51,7 +51,7 @@ function LoginPage() {
           const response = await authClient.signIn.email({
             email: value.email,
             password: value.password,
-            callbackURL: `${SITE_URL}/dashboard`,
+            callbackURL: `${SITE_URL}${AUTH_IS_AUTH_URL}`,
           })
           if (response.error) {
             throw new Error(response.error.message)
