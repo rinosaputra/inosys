@@ -1,7 +1,15 @@
-import { SITE_TITLE } from "#/lib/site";
-import { createFileRoute, Link, Outlet } from "@tanstack/react-router";
+import { getSession } from "#/integrations/better-auth/server";
+import { AUTH_IS_AUTH_URL, SITE_TITLE } from "#/lib/site";
+import { createFileRoute, Link, Outlet, redirect } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/(auth)")({
+  beforeLoad: async () => {
+    const session = await getSession();
+    if (session) {
+      throw redirect({ to: AUTH_IS_AUTH_URL });
+    }
+    return { auth: null };
+  },
   component: AuthLayout,
 });
 
