@@ -1,4 +1,5 @@
-import z from 'zod'
+import 'dotenv/config';
+import z from "zod";
 
 export const connection = z
   .object({
