@@ -16,3 +16,5 @@ export const connection = z
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
   });
+
+export type Connection = z.infer<typeof connection>;
