@@ -14,3 +14,4 @@ __unconfig*
 todos.json
 routeTree.gen.ts
 .vercel
+.generated
