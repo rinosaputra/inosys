@@ -14,3 +14,7 @@ __unconfig*
 todos.json
 routeTree.gen.ts
 .vercel
+<<<<<<< HEAD
+=======
+.generated
+>>>>>>> group/auth
