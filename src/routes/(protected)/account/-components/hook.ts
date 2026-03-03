@@ -10,6 +10,7 @@ import type {
   UpdatePasswordInput,
   UpdateProfileInput
 } from './schema'
+import { getContext } from '#/integrations/tanstack-query/root-provider'
 
 const queryKey = (...keys: string[]) => ['account', ...keys]
 
@@ -104,4 +105,58 @@ export const useAccountSessionLists = () => {
       return response.data
     },
   })
+}
+
+export const useAccountRevokeSession = () => {
+  const { queryClient } = getContext()
+  const action = useMutation({
+    mutationFn: async (token: string) => {
+      const response = await authClient.revokeSession({
+        token
+      })
+      if (response.error) {
+        throw new Error(response.error.message)
+      }
+      return response.data
+    }
+  })
+  return {
+    isLoading: action.isPending,
+    revokeSession: (token: string) => toast.promise(action.mutateAsync(token), {
+      loading: 'Revoking session...',
+      success: () => {
+        queryClient.invalidateQueries({
+          queryKey: queryKey(),
+        })
+        return 'Session revoked successfully'
+      },
+      error: (err) => err.message || 'Failed to revoke session',
+    }),
+  }
+}
+
+export const useAccountRevokeAllSession = () => {
+  const { queryClient } = getContext()
+  const action = useMutation({
+    mutationFn: async () => {
+      const response = await authClient.revokeOtherSessions({})
+      if (response.error) {
+        throw new Error(response.error.message)
+      }
+      return response.data
+    }
+  })
+  return {
+    isLoading: action.isPending,
+    revokeAllSessions: () => toast.promise(action.mutateAsync(), {
+      loading: 'Revoking all sessions...',
+      success: () => {
+        queryClient.invalidateQueries({
+          queryKey: queryKey(),
+        })
+        return 'Session revoked successfully'
+      },
+      error: (err) => err.message || 'Failed to revoke session',
+    }),
+  }
 }

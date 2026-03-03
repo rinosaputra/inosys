@@ -8,6 +8,7 @@
     "@prisma/client": "^7.4.2",
     "@tailwindcss/vite": "^4.1.18",
     "@tanstack/react-devtools": "^0.7.0",
+    "@tanstack/react-form": "^1.28.3",
     "@tanstack/react-form-start": "^1.28.3",
     "@tanstack/react-query": "^5.90.21",
     "@tanstack/react-router-devtools": "^1.132.0",
