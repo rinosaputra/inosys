@@ -1,5 +1,5 @@
 import { createFileRoute, Link, Outlet } from '@tanstack/react-router'
-import { ACCOUNT_URLs } from './-urls';
+import { ACCOUNT_URLs } from './-components/urls';
 import type { CreateMetaInput } from '#/lib/seo';
 
 const metadata: CreateMetaInput = {

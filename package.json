@@ -9,6 +9,7 @@
     "@tailwindcss/vite": "^4.1.18",
     "@tanstack/react-devtools": "^0.7.0",
     "@tanstack/react-form-start": "^1.28.3",
+    "@tanstack/react-query": "^5.90.21",
     "@tanstack/react-router-devtools": "^1.132.0",
     "@tanstack/react-start": "^1.132.0",
     "@tanstack/router-plugin": "^1.132.0",
@@ -25,7 +26,8 @@
     "react-dom": "^19.2.0",
     "sonner": "^2.0.7",
     "tailwind-merge": "^3.5.0",
-    "tailwindcss": "^4.1.18"
+    "tailwindcss": "^4.1.18",
+    "ua-parser-js": "^2.0.9"
   },
   "description": "Inosys: TypeScript (Node 20) app with email/password auth + JWT access token, Knex + MySQL (XAMPP local dev), and Vitest tests. Workflow: feature/* -> dev -> main.",
   "devDependencies": {

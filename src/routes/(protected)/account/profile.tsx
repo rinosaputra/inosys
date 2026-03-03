@@ -1,6 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useForm } from '@tanstack/react-form'
-import z from 'zod'
 import type { CreateMetaInput } from '#/lib/seo'
 import { Button } from '#/components/ui/button'
 import {
@@ -12,6 +11,9 @@ import {
 import { Input } from '#/components/ui/input'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '#/components/ui/card'
 import { Separator } from '#/components/ui/separator'
+import { UpdateProfileSchema } from './-components/schema'
+import { useAccountUpdateProfile } from './-components/hook'
+import { Spinner } from '#/components/ui/spinner'
 
 const metadata: CreateMetaInput = {
   title: 'Profile Settings',
@@ -22,25 +24,19 @@ export const Route = createFileRoute('/(protected)/account/profile')({
   component: AccountProfilePage,
 })
 
-const Schema = z.object({
-  name: z.string().min(1, 'Name is required.'),
-  avatarUrl: z
-    .url('Avatar must be a valid URL.')
-    .or(z.literal('')),
-})
-
 function AccountProfilePage() {
   const { auth: { user } } = Route.useRouteContext()
+  const { updateProfile, isLoading } = useAccountUpdateProfile()
 
   const form = useForm({
-    validators: { onSubmit: Schema },
+    validators: { onSubmit: UpdateProfileSchema },
     defaultValues: {
       name: user.name ?? '',
       avatarUrl: user.image ?? '',
     },
     async onSubmit({ value }) {
-      // TODO(feat): serverFn update profile (Prisma) + toast
       console.log('update profile', value)
+      updateProfile(value)
     },
   })
 
@@ -117,7 +113,10 @@ function AccountProfilePage() {
         <Separator />
         <CardFooter>
           <Field>
-            <Button type="submit">Save profile</Button>
+            <Button type="submit" disabled={isLoading}>
+              {isLoading && <Spinner />}
+              {isLoading ? 'Saving...' : 'Save profile'}
+            </Button>
           </Field>
         </CardFooter>
       </Card>

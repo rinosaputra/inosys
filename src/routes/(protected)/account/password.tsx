@@ -1,6 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useForm } from '@tanstack/react-form'
-import z from 'zod'
 import type { CreateMetaInput } from '#/lib/seo'
 import { Button } from '#/components/ui/button'
 import {
@@ -13,7 +12,9 @@ import {
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '#/components/ui/card'
 import { Separator } from '#/components/ui/separator'
 import { PasswordInput } from '#/components/password'
-import { passwordSchema } from '#/components/password/schema'
+import { UpdatePasswordSchema } from './-components/schema'
+import { useAccountUpdatePassword } from './-components/hook'
+import { Spinner } from '#/components/ui/spinner'
 
 const metadata: CreateMetaInput = {
   title: 'Password Settings',
@@ -24,20 +25,10 @@ export const Route = createFileRoute('/(protected)/account/password')({
   component: AccountPasswordPage,
 })
 
-const Schema = z
-  .object({
-    currentPassword: z.string().min(1, 'Current password is required.'),
-    newPassword: passwordSchema,
-    confirmNewPassword: z.string().min(1, 'Please confirm your new password.'),
-  })
-  .refine((v) => v.newPassword === v.confirmNewPassword, {
-    message: 'Passwords do not match.',
-    path: ['confirmNewPassword'],
-  })
-
 function AccountPasswordPage() {
+  const { updatePassword, isLoading } = useAccountUpdatePassword()
   const form = useForm({
-    validators: { onSubmit: Schema },
+    validators: { onSubmit: UpdatePasswordSchema },
     defaultValues: {
       currentPassword: '',
       newPassword: '',
@@ -46,6 +37,7 @@ function AccountPasswordPage() {
     async onSubmit({ value }) {
       // TODO(feat): serverFn change password (Better Auth) + toast
       console.log('change password', value)
+      updatePassword(value)
     },
   })
 
@@ -150,7 +142,10 @@ function AccountPasswordPage() {
         <Separator />
         <CardFooter>
           <Field>
-            <Button type="submit">Update password</Button>
+            <Button type="submit" disabled={isLoading}>
+              {isLoading && <Spinner />}
+              {isLoading ? 'Updating...' : 'Update password'}
+            </Button>
           </Field>
         </CardFooter>
       </Card>

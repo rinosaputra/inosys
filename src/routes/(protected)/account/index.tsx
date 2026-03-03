@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { Link } from 'lucide-react'
-import { ACCOUNT_URLs } from './-urls';
+import { ACCOUNT_URLs } from './-components/urls';
 import type { CreateMetaInput } from '#/lib/seo';
 
 const metadata: CreateMetaInput = {
