@@ -2,9 +2,8 @@ import {
   BadgeCheck,
   Bell,
   ChevronsUpDown,
-  CreditCard,
+  Cog,
   LogOut,
-  Sparkles,
 } from "lucide-react"
 
 import {
@@ -27,6 +26,8 @@ import { memo } from "react"
 import { toast } from "sonner"
 import { authClient } from "#/lib/auth-client"
 import { cn } from "#/lib/utils"
+import { Link, useRouter } from "@tanstack/react-router"
+import { ACCOUNT_URL, AUTH_LOGIN_URL, NOTIFICATIONS_URL, SETTINGS_URL } from "#/lib/site"
 
 const AvatarUser = memo(({
   user,
@@ -46,10 +47,14 @@ const AvatarUser = memo(({
 })
 
 function SignOutButton() {
+  const router = useRouter()
   const handleSignOut = () => {
     toast.promise(authClient.signOut(), {
       loading: "Signing out...",
-      success: "Signed out successfully",
+      success: () => {
+        router.navigate({ to: AUTH_LOGIN_URL })
+        return "Signed out successfully"
+      },
       error: "Failed to sign out",
     })
   }
@@ -85,24 +90,23 @@ export function NavUser(props: Auth['Session'] & { autoHide?: boolean }) {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <DropdownMenuItem>
-            <Sparkles />
-            Upgrade to Pro
+          <DropdownMenuItem asChild>
+            <Link to={ACCOUNT_URL}>
+              <BadgeCheck />
+              Account
+            </Link>
           </DropdownMenuItem>
-        </DropdownMenuGroup>
-        <DropdownMenuSeparator />
-        <DropdownMenuGroup>
-          <DropdownMenuItem>
-            <BadgeCheck />
-            Account
+          <DropdownMenuItem asChild>
+            <Link to={SETTINGS_URL}>
+              <Cog />
+              Settings
+            </Link>
           </DropdownMenuItem>
-          <DropdownMenuItem>
-            <CreditCard />
-            Billing
-          </DropdownMenuItem>
-          <DropdownMenuItem>
-            <Bell />
-            Notifications
+          <DropdownMenuItem asChild>
+            <Link to={NOTIFICATIONS_URL}>
+              <Bell />
+              Notifications
+            </Link>
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
