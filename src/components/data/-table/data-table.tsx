@@ -27,12 +27,15 @@ import {
 
 import { DataTablePagination } from "./data-table-pagination"
 import { DataTableToolbar } from "./data-table-toolbar"
+import type { DataTableSearch } from "../schema"
+import { useNavigate } from "@tanstack/react-router"
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
-  searchKey?: string
-  searchPlaceholder?: string
+  search: DataTableSearch
+  setSearch(search: DataTableSearch): void
+  pageCount: number
   filterableColumns?: {
     id: string
     title: string
@@ -47,10 +50,22 @@ interface DataTableProps<TData, TValue> {
 export function DataTable<TData, TValue>({
   columns,
   data,
-  searchKey,
-  searchPlaceholder = "Search...",
   filterableColumns = [],
+  search,
+  setSearch,
+  pageCount,
 }: DataTableProps<TData, TValue>) {
+  // @ts-ignore
+  const navigate = useNavigate({ from: fullPath })
+  const {
+    filters,
+    page,
+    pageSize,
+    searchKey,
+    searchValue,
+    sortBy,
+    sortDir
+  } = search
   const [rowSelection, setRowSelection] = React.useState({})
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({})
@@ -67,7 +82,22 @@ export function DataTable<TData, TValue>({
       columnVisibility,
       rowSelection,
       columnFilters,
+      pagination: {
+        pageIndex: page - 1,
+        pageSize,
+      }
     },
+    manualPagination: true,
+    pageCount,
+    onPaginationChange: () => {
+
+      setSearch({
+        page: page + 1,
+        pageSize: String(pageSize),
+      })
+
+    },
+
     enableRowSelection: true,
     onRowSelectionChange: setRowSelection,
     onSortingChange: setSorting,
@@ -85,8 +115,8 @@ export function DataTable<TData, TValue>({
     <div className="space-y-4">
       <DataTableToolbar
         table={table}
-        searchKey={searchKey}
-        searchPlaceholder={searchPlaceholder}
+        searchKey={search.searchKey}
+        searchPlaceholder={search.searchValue}
         filterableColumns={filterableColumns}
       />
       <div className="rounded-md border">

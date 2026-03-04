@@ -1,7 +1,7 @@
 import type { ColumnDef } from "@tanstack/react-table"
 import { Badge } from "@/components/ui/badge"
-import { DataTableColumnHeader } from "@/components/data-table/data-table-column-header"
-import { DataTableRowActions } from "@/components/data-table/data-table-row-actions"
+import { DataTableColumnHeader } from "#/components/data/table/data-table-column-header"
+import { DataTableRowActions } from "#/components/data/table/data-table-row-actions"
 import type { UserRow } from "./schema"
 
 export const userColumns: ColumnDef<UserRow>[] = [
