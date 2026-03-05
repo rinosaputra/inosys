@@ -32,7 +32,7 @@ export function DataTableFacetedFilter<TData>({
   disabled
 
 }: DataTableFacetedFilterProps<TData>) {
-  const selectedValues = column.getFacetedValues()
+  const selectedValues = column.facetedValues
   return (
     <Popover>
       <PopoverTrigger asChild>

@@ -26,13 +26,13 @@ export function DataTablePagination<TData>({
         <div className="flex items-center space-x-2">
           <p className="text-sm font-medium">Rows per page</p>
           <Select
-            value={`${table.getQuery().pagination.limit}`}
+            value={`${table.query.pagination.limit}`}
             onValueChange={(value) => {
               table.setPageSize(Number(value))
             }}
           >
             <SelectTrigger className="w-17.5">
-              <SelectValue placeholder={table.getQuery().pagination.limit} />
+              <SelectValue placeholder={table.query.pagination.limit} />
             </SelectTrigger>
             <SelectContent side="top">
               {[10, 20, 30, 40, 50].map((pageSize) => (
@@ -44,7 +44,7 @@ export function DataTablePagination<TData>({
           </Select>
         </div>
         <div className="flex w-25 items-center justify-center text-sm font-medium">
-          Page {table.getQuery().pagination.index + 1} of{" "}
+          Page {table.query.pagination.index + 1} of{" "}
           {table.getPageCount()}
         </div>
         <div className="flex items-center space-x-2">

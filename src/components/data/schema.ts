@@ -1,4 +1,4 @@
-import z from "zod"
+import z, { array } from "zod"
 import _ from 'lodash'
 
 const nonEmptyString = z
@@ -37,13 +37,16 @@ export const dataSearchSchema = z.object({
 
   // filters (optional & flexible)
   // - value can be string or array for multi-value filters (e.g. multi-select)
-  filters: z.record(nonEmptyString, z.object({
-    value: z.union([nonEmptyString, z.array(nonEmptyString)]),
-    operator: dataTableOperators.default("eq"),
-  })).catch({}),
+  filters: z.record(
+    nonEmptyString,
+    z.object({
+      value: z.array(nonEmptyString).or(nonEmptyString),
+      operator: dataTableOperators.default("eq"),
+    })
+  ).catch({}),
 
   // views (optional, for saving column visibility or other UI state)
-  views: z.record(nonEmptyString, z.coerce.boolean().default(true)).catch({}),
+  views: z.record(nonEmptyString, z.coerce.boolean()).catch({}),
 })
 
 export type DataSearch = z.infer<typeof dataSearchSchema>
@@ -64,7 +67,12 @@ export function toDataSearchSchema(input: Record<string, string>): DataSearch {
     views: {},
   }
   const data = Object.entries(input).reduce((acc, [key, value]) => {
-    acc = _.set(acc, key, value)
+    acc = _.set(acc, key, key.startsWith("pagination.")
+      ? Number(value)
+      : key.startsWith("views.")
+        ? value === "true"
+        : value
+    )
     return acc
   }, { ...defaultSearch })
   const parse = dataSearchSchema.safeParse(data)
@@ -96,7 +104,13 @@ export function toURLSearchParams(search: DataSearch) {
 
   // filters
   Object.entries(search.filters).forEach(([key, { value, operator }]) => {
-    params.push([`filters.${key}.value`, String(value)])
+    if (Array.isArray(value)) {
+      value.forEach((val, index) => {
+        params.push([`filters.${key}.value.${index}`, String(val)])
+      })
+    } else {
+      params.push([`filters.${key}.value`, String(value)])
+    }
     params.push([`filters.${key}.operator`, operator])
   })
 

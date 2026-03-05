@@ -4,33 +4,59 @@ import { DataTableViewOptions } from "./data-table-view-options"
 import { DataTableFacetedFilter } from "./data-table-faceted-filter"
 import { RefreshCw } from "lucide-react"
 import type { DataTable } from "./types"
+import { useState } from "react"
 
 interface DataTableToolbarProps<TData> {
   table: DataTable<TData>
 }
 
+const DataTableSearchableColumn = <TData,>(table: DataTable<TData>) => {
+  const searchableColumn = table.getSearchableColumn()
+  const defaultValue = searchableColumn?.column.filterValue ?? ""
+  const [value, setValue] = useState(() => defaultValue)
+  // const setFilterValue = searchableColumn?.column.setFilterValue
+  // useEffect(() => {
+  //   const handler = setTimeout(() => {
+  //     console.log("value")
+  //     if (setFilterValue) setFilterValue(value);
+  //   }, 500);
+
+  //   return () => {
+  //     clearTimeout(handler);
+  //   };
+  // }, [value, setFilterValue]);
+
+  if (!searchableColumn) return null
+  return (<Input
+    placeholder={searchableColumn.placeholder}
+    value={value}
+    onChange={(event) =>
+      setValue(event.target.value)
+    }
+    className="h-8 w-37.5 lg:w-62.5"
+    disabled={table.isLoading}
+  />)
+}
+
+const IsFilterActive = <TData,>(table: DataTable<TData>) => {
+  if (table.getColumnFilters().length === 0) return null
+  return <Button
+    variant="ghost"
+    onClick={() => table.resetColumnFilters()}
+    disabled={table.isLoading}
+  >
+    Reset
+    <RefreshCw />
+  </Button>
+}
+
 export function DataTableToolbar<TData>({
   table
 }: DataTableToolbarProps<TData>) {
-  const isFiltered = table.getColumnFilters().length > 0
-  const searchableColumn = table.getSearchableColumn()
-
   return (
     <div className="flex items-center justify-between">
       <div className="flex flex-1 items-center space-x-2">
-        {searchableColumn && (
-          <Input
-            placeholder={searchableColumn.placeholder}
-            value={
-              (searchableColumn.column.getFilterValue() as string) ?? ""
-            }
-            onChange={(event) =>
-              searchableColumn.column.setFilterValue(event.target.value)
-            }
-            className="h-8 w-37.5 lg:w-62.5"
-            disabled={table.isLoading}
-          />
-        )}
+        <DataTableSearchableColumn {...table} />
         {table.getFilterableColumns().map(
           (props) =>
             <DataTableFacetedFilter
@@ -40,16 +66,7 @@ export function DataTableToolbar<TData>({
               {...props}
             />
         )}
-        {isFiltered && (
-          <Button
-            variant="ghost"
-            onClick={() => table.resetColumnFilters()}
-            disabled={table.isLoading}
-          >
-            Reset
-            <RefreshCw />
-          </Button>
-        )}
+        <IsFilterActive {...table} />
       </div>
       <DataTableViewOptions table={table} />
     </div>

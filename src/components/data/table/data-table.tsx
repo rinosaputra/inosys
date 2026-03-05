@@ -7,7 +7,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 
-// import { DataTablePagination } from "./data-table-pagination"
+import { DataTablePagination } from "./data-table-pagination"
 import { DataTableToolbar } from "./data-table-toolbar"
 import type { DataTable, DataTableColumnDef, DataTableSearch } from "./types"
 import _ from "lodash"
@@ -15,6 +15,7 @@ import type { UseNavigateResult } from "@tanstack/react-router"
 import { toDataSearchSchema, toURLSearchParams, type DataSearch } from "../schema"
 import { DataTableColumnHeader } from "./data-table-column-header"
 import { useQuery } from "@tanstack/react-query"
+import { toast } from "sonner"
 
 export const getDataTableQueryKey = <T,>(name: T, ...props: unknown[]) => {
   return ["data-table", name, ...props] as const
@@ -57,45 +58,42 @@ function getDataTable<TData>({
       columnDef: {
         header: column
       },
-      getCanSort: () => !!column.sortable,
-      getIsSorted: () => {
-        if (!column.sortable) return false
-        return navigate.getQuery().sorts[column.id] || false
-      },
+      canSort: !!column.sortable,
+      isSorted: !column.sortable ? false : navigate.query.sorts[column.id] || false,
       toggleSorting: (desc) => {
         if (!column.sortable) return
-        const newSorts = { ...navigate.getQuery().sorts }
-        if (typeof desc === "undefined") {
-          if (!newSorts[column.id]) {
-            newSorts[column.id] = "asc"
-          } else {
-            newSorts[column.id] = newSorts[column.id] === "asc" ? "desc" : "asc"
+        navigate.setQuery({
+          sorts: {
+            ...navigate.query.sorts,
+            [column.id]: typeof desc === "undefined" ? "asc" : desc ? "desc" : "asc"
           }
-        } else {
-          newSorts[column.id] = desc ? "desc" : "asc"
-        }
-        navigate.setQuery({ sorts: newSorts })
+        })
       },
-      getIsVisible: () => {
-        if (!column.visibility) return true
-        return navigate.getQuery().views[column.id] !== false
-      },
-      getCanHide: () => !!column.visibility,
-      toggleVisibility: (visible) => {
+      canVisible: !!column.visibility,
+      isVisible: !column.visibility
+        ? false
+        : typeof navigate.query.views[column.id] === 'undefined'
+          ? true
+          : navigate.query.views[column.id],
+      toggleVisible: (visible) => {
         if (!column.visibility) return
-        // Implementation for toggling visibility
-        const newViews = { ...navigate.getQuery().views }
-        newViews[column.id] = visible === false ? false : true
-        navigate.setQuery({ views: newViews })
+        const current = navigate.query.views[column.id]
+        navigate.setQuery({
+          views: {
+            ...navigate.query.views,
+            [column.id]: typeof visible === 'undefined' ?
+              typeof current === 'undefined'
+                ? true :
+                !current
+              : visible
+          }
+        })
       },
-      getCanFilter: () => !!column.filter,
-      getFilterValue: () => {
-        if (!column.filter) return undefined
-        return navigate.getQuery().filters[column.id]?.value
-      },
+      canFilter: !!column.filter,
+      filterValue: !column.filter ? undefined : navigate.query.filters[column.id]?.value,
       setFilterValue: (value, operator = "eq") => {
         if (!column.filter) return
-        const newFilters = { ...navigate.getQuery().filters }
+        const newFilters = { ...navigate.query.filters }
         if (!value && newFilters[column.id]) {
           delete newFilters[column.id]
         } else {
@@ -106,14 +104,14 @@ function getDataTable<TData>({
         }
         navigate.setQuery({ filters: newFilters })
       },
-      getFacetedValues: () => {
-        const newFilters = { ...navigate.getQuery().filters }
-        const filterValue = newFilters[column.id]?.value || ''
-        return (Array.isArray(filterValue) ? filterValue : [filterValue]).filter(Boolean)
-      },
+      facetedValues: (navigate.query.filters[column.id]?.value
+        ? Array.isArray(navigate.query.filters[column.id].value)
+          ? navigate.query.filters[column.id].value
+          : [navigate.query.filters[column.id].value]
+        : []) as string[],
       setFacetedValue: (value) => {
         if (!column.filter) return
-        const newFilters = { ...navigate.getQuery().filters }
+        const newFilters = { ...navigate.query.filters }
         if (!newFilters[column.id]) {
           newFilters[column.id] = {
             value: [value],
@@ -131,9 +129,13 @@ function getDataTable<TData>({
           } else {
             currentValues.push(value)
           }
-          newFilters[column.id] = {
-            value: currentValues,
-            operator: "in"
+          if (currentValues.length) {
+            newFilters[column.id] = {
+              value: currentValues,
+              operator: "in"
+            }
+          } else {
+            delete newFilters[column.id]
           }
         }
         navigate.setQuery({ filters: newFilters })
@@ -141,39 +143,42 @@ function getDataTable<TData>({
     }
   }
   const getPageCount = () => {
-    const limit = navigate.getQuery().pagination.limit
+    const limit = navigate.query.pagination.limit
     return Math.ceil(total / limit)
   }
   return {
     ...navigate,
     name: props.name,
     isLoading,
-    getHeaderGroups: () => [{
+    headerGroups: [{
       id: "header",
-      headers: props.columns.map((column) => ({
-        id: column.id,
-        column: getColumn(column.id)!,
-        isPlaceholder: false,
-        colSpan: 1,
-      })),
+      headers: props.columns
+        .filter((column) => !!column.visibility && navigate.query.views[column.id] !== false)
+        .map((column) => ({
+          id: column.id,
+          column: getColumn(column.id)!,
+          isPlaceholder: false,
+          colSpan: 1,
+        })),
     }],
-    getRowModel: () => ({
+    rowModel: {
       rows: data.map((row, index) => ({
         id: String(index),
         original: row,
         getValue: (columnId: string) => _.get(row, columnId),
-        getIsSelected: () => false,
-        getVisibleCells: () =>
-          props.columns.map((column) => ({
+        isSelected: false,
+        visibleCells: props.columns
+          .filter((column) => !!column.visibility && navigate.query.views[column.id] !== false)
+          .map((column) => ({
             id: `${String(index)}-${column.id}`,
             column: {
               columnDef: column
             },
           })),
       })),
-    }),
+    },
     getColumn,
-    resetColumnFilters: () => navigate.setQuery({ filters: {} }),
+    resetColumnFilters: () => navigate.setQuery({ filters: {}, search: {} }),
     getFilterableColumns: () => props.columns.filter(col => col.filter).map(col => ({
       column: getColumn(col.id)!,
       filter: {
@@ -184,7 +189,10 @@ function getDataTable<TData>({
         }))
       },
     })),
-    getColumnFilters: () => Object.keys(navigate.getQuery().filters),
+    getColumnFilters: () => [
+      ...Object.keys(navigate.query.search),
+      ...Object.keys(navigate.query.filters)
+    ].filter((e, i, a) => a.indexOf(e) === i),
     getSearchableColumn: (name) => {
       const columns = props.columns.filter(col => col.searchable)
       if (!columns.length) return undefined
@@ -195,12 +203,12 @@ function getDataTable<TData>({
         placeholder: column.searchable?.placeholder || `Search ${column.label}...`
       }
     },
-    getAllColumns: () => props.columns.map(col => getColumn(col.id)!),
+    allColumns: props.columns.map(col => getColumn(col.id)!),
     getPageCount,
     setPageSize: (size) => {
       navigate.setQuery({
         pagination: {
-          ...navigate.getQuery().pagination,
+          ...navigate.query.pagination,
           limit: size,
           index: 0, // reset to first page when page size changes
         }
@@ -209,33 +217,33 @@ function getDataTable<TData>({
     setPageIndex: (index) => {
       navigate.setQuery({
         pagination: {
-          ...navigate.getQuery().pagination,
+          ...navigate.query.pagination,
           index,
         }
       })
     },
-    getCanPreviousPage: () => navigate.getQuery().pagination.index > 0,
+    getCanPreviousPage: () => navigate.query.pagination.index > 0,
     previousPage: () => {
-      if (navigate.getQuery().pagination.index > 0) {
+      if (navigate.query.pagination.index > 0) {
         navigate.setQuery({
           pagination: {
-            ...navigate.getQuery().pagination,
-            index: navigate.getQuery().pagination.index - 1,
+            ...navigate.query.pagination,
+            index: navigate.query.pagination.index - 1,
           }
         })
       }
     },
     getCanNextPage: () => {
       const pageCount = getPageCount()
-      return navigate.getQuery().pagination.index < pageCount - 1
+      return navigate.query.pagination.index < pageCount - 1
     },
     nextPage: () => {
       const pageCount = getPageCount()
-      if (navigate.getQuery().pagination.index < pageCount - 1) {
+      if (navigate.query.pagination.index < pageCount - 1) {
         navigate.setQuery({
           pagination: {
-            ...navigate.getQuery().pagination,
-            index: navigate.getQuery().pagination.index + 1,
+            ...navigate.query.pagination,
+            index: navigate.query.pagination.index + 1,
           }
         })
       }
@@ -248,33 +256,47 @@ function getDataTable<TData>({
 // }
 
 export function DataTable<TData>(props: DataTableProps<TData>) {
+  const query = toDataSearchSchema(props.search)
   const navigate: DataTableSearch = {
-    getQuery() {
-      return toDataSearchSchema(props.search)
-    },
+    query,
     setQuery(search) {
       props.navigate({
         // @ts-ignore
         search: toURLSearchParams({
-          ...props.search,
+          ...query,
           ...search
-        })
+        }),
       })
     }
   }
   const total = useQuery({
-    queryKey: getDataTableQueryKey(props.name, "count", props.search),
+    queryKey: getDataTableQueryKey(props.name, "count", {
+      search: query.search,
+      filters: query.filters
+    }),
     queryFn: async () => {
-      const count = await props.getCount(navigate.getQuery())
-      return count
+      try {
+        const count = await props.getCount(navigate.query)
+        return count
+      } catch (error) {
+        console.error("Error fetching count:", error)
+        toast.error("Failed to fetch data count")
+        return 0
+      }
     },
     refetchOnWindowFocus: false,
   })
   const data = useQuery({
-    queryKey: getDataTableQueryKey(props.name, "data", props.search),
+    queryKey: getDataTableQueryKey(props.name, "data", query),
     queryFn: async () => {
-      const data = await props.getData(navigate.getQuery())
-      return data
+      try {
+        const data = await props.getData(navigate.query)
+        return data
+      } catch (error) {
+        console.error("Error fetching data:", error)
+        toast.error("Failed to fetch data")
+        return []
+      }
     },
     // keepPreviousData: true,
     // Refetch data when filters or sorting change
@@ -285,11 +307,18 @@ export function DataTable<TData>(props: DataTableProps<TData>) {
     queryKey: getDataTableQueryKey(props.name, "facets"),
     queryFn: async () => {
       if (!props.getFacets) return {}
-      const facets = await props.getFacets()
-      return facets
+      try {
+
+        const facets = await props.getFacets()
+        return facets
+      } catch (error) {
+        console.error("Error fetching facets:", error)
+        toast.error("Failed to fetch facets")
+        return {}
+      }
     },
     refetchOnWindowFocus: false,
-    enabled: total.data !== 0 && !!props.getFacets, // Only fetch facets if there are results to show
+    enabled: !!props.getFacets, // Only fetch facets if there are results to show
   })
   const table = getDataTable({
     props,
@@ -307,7 +336,7 @@ export function DataTable<TData>(props: DataTableProps<TData>) {
       <div className="rounded-md border">
         <Table>
           <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
+            {table.headerGroups.map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
                   return (
@@ -326,13 +355,13 @@ export function DataTable<TData>(props: DataTableProps<TData>) {
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
+            {table.rowModel.rows?.length ? (
+              table.rowModel.rows.map((row) => (
                 <TableRow
                   key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
+                  data-state={row.isSelected && "selected"}
                 >
-                  {row.getVisibleCells().map((cell) => (
+                  {row.visibleCells.map((cell) => (
                     <TableCell key={cell.id}>
                       {cell.column.columnDef.cell({ row })}
                     </TableCell>
@@ -352,7 +381,7 @@ export function DataTable<TData>(props: DataTableProps<TData>) {
           </TableBody>
         </Table>
       </div>
-      {/* <DataTablePagination table={table} /> */}
+      <DataTablePagination table={table} />
     </div>
   )
 }

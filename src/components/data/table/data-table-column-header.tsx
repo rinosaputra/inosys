@@ -23,7 +23,7 @@ export function DataTableColumnHeader<TData>({
   className,
   disabled
 }: DataTableColumnHeaderProps<TData>) {
-  if (!column.getCanSort() && !column.getCanHide()) {
+  if (!column.canSort && !column.canVisible) {
     return <div className={cn(className)}>{title}</div>
   }
 
@@ -38,9 +38,9 @@ export function DataTableColumnHeader<TData>({
             disabled={disabled}
           >
             <span>{title}</span>
-            {column.getIsSorted() === "desc" ? (
+            {column.isSorted === "desc" ? (
               <ArrowDown />
-            ) : column.getIsSorted() === "asc" ? (
+            ) : column.isSorted === "asc" ? (
               <ArrowDown className="rotate-180" />
             ) : (
               <ChevronsUpDown />
@@ -48,7 +48,7 @@ export function DataTableColumnHeader<TData>({
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="start">
-          {column.getCanSort() && (<>
+          {column.canSort && (<>
             <DropdownMenuItem onClick={() => column.toggleSorting(false)}>
               <ArrowDown className="text-muted-foreground/70 rotate-180" />
               Asc
@@ -58,9 +58,9 @@ export function DataTableColumnHeader<TData>({
               Desc
             </DropdownMenuItem>
           </>)}
-          {column.getCanHide() && (<>
-            {column.getCanSort() && <DropdownMenuSeparator />}
-            <DropdownMenuItem onClick={() => column.toggleVisibility(false)}>
+          {column.canVisible && (<>
+            {column.canSort && <DropdownMenuSeparator />}
+            <DropdownMenuItem onClick={() => column.toggleVisible(false)}>
               <EyeClosed className="text-muted-foreground/70" />
               Hide
             </DropdownMenuItem>

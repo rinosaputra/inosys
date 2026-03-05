@@ -10,6 +10,7 @@ export const userColumns: DataTableColumnDef<UserRow>[] = [
     id: "name",
     label: "Name",
     cell: ({ row }) => <div className="font-medium">{row.getValue("name")}</div>,
+    visibility: {},
     searchable: {
       placeholder: "Search by name"
     }
@@ -18,11 +19,18 @@ export const userColumns: DataTableColumnDef<UserRow>[] = [
     id: "email",
     label: "Email",
     cell: ({ row }) => <div className="text-muted-foreground">{row.getValue("email")}</div>,
+    visibility: {},
   },
   {
     id: "role",
     label: "Role",
-    cell: ({ row }) => <Badge variant="outline">{row.getValue("role")}</Badge>,
+    cell: ({ row }) => <Badge variant={row.getValue("role") === "member"
+      ? "default"
+      : row.getValue("role") === "admin"
+        ? "outline"
+        : "destructive"
+    }>{row.getValue("role")}</Badge>,
+    visibility: {},
     filter: {
       label: "Role",
       options: roles.map((role) => ({
@@ -34,7 +42,8 @@ export const userColumns: DataTableColumnDef<UserRow>[] = [
   {
     id: "status",
     label: "Status",
-    cell: ({ row }) => <Badge variant="secondary">{row.getValue("status")}</Badge>,
+    cell: ({ row }) => <Badge variant={row.getValue("status") === "active" ? "outline" : "destructive"}>{row.getValue("status")}</Badge>,
+    visibility: {},
     filter: {
       label: "Status",
       options: statuses.map((status) => ({
@@ -47,10 +56,12 @@ export const userColumns: DataTableColumnDef<UserRow>[] = [
     id: "lastSeenAt",
     label: "Last Seen",
     cell: ({ row }) => new Date(row.getValue("lastSeenAt")).toLocaleString(),
+    visibility: {},
   },
   {
     id: "createdAt",
     label: "Created",
     cell: ({ row }) => new Date(row.getValue("createdAt")).toLocaleDateString(),
+    visibility: {},
   },
 ]

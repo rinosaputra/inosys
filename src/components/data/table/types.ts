@@ -2,7 +2,7 @@ import type { LucideIcon } from "lucide-react"
 import type { DataSearch, DataTableOperator } from "../schema"
 
 export interface DataTableSearch {
-  getQuery(): DataSearch
+  query: DataSearch
   setQuery(search: Partial<DataSearch>): void
 }
 
@@ -10,8 +10,8 @@ export interface DataTableRow<TData> {
   id: string
   original: TData
   getValue(columnId?: string): any
-  getIsSelected(): boolean
-  getVisibleCells(): {
+  isSelected: boolean
+  visibleCells: {
     id: string
     column: {
       columnDef: DataTableColumnDef<TData>
@@ -52,23 +52,23 @@ export interface DataTableColumn<TData> {
   columnDef: {
     header: DataTableColumnDef<TData>
   },
-  getCanSort(): boolean
-  getIsSorted(): "asc" | "desc" | false
+  canSort: boolean
+  isSorted: "asc" | "desc" | false
   toggleSorting(desc?: boolean): void
-  getCanHide(): boolean
-  getIsVisible(): boolean
-  toggleVisibility(visible?: boolean): void
-  getCanFilter(): boolean
-  getFilterValue(): string | string[] | undefined
+  canVisible: boolean
+  isVisible: boolean
+  toggleVisible(visible?: boolean): void
+  canFilter: boolean
+  filterValue: string | string[] | undefined
   setFilterValue(value: string | string[] | undefined, operator?: DataTableOperator): void
-  getFacetedValues(): string[]
+  facetedValues: string[]
   setFacetedValue(value: string): void
 }
 
 export type DataTable<TData> = DataTableSearch & {
   name: string
   isLoading: boolean
-  getHeaderGroups: () => {
+  headerGroups: {
     id: string
     headers: {
       id: string
@@ -77,7 +77,7 @@ export type DataTable<TData> = DataTableSearch & {
       colSpan: number
     }[]
   }[]
-  getRowModel: () => {
+  rowModel: {
     rows: DataTableRow<TData>[]
   }
   getColumn(columnId: string): DataTableColumn<TData> | undefined
@@ -91,7 +91,7 @@ export type DataTable<TData> = DataTableSearch & {
     column: DataTableColumn<TData>
     placeholder: string
   } | undefined
-  getAllColumns(): DataTableColumn<TData>[]
+  allColumns: DataTableColumn<TData>[]
   // pagination
   getPageCount(): number
   setPageSize(size: number): void
