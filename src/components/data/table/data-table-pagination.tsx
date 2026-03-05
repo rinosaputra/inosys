@@ -45,14 +45,14 @@ export function DataTablePagination<TData>({
         </div>
         <div className="flex w-25 items-center justify-center text-sm font-medium">
           Page {table.query.pagination.index + 1} of{" "}
-          {table.getPageCount()}
+          {table.pageCount}
         </div>
         <div className="flex items-center space-x-2">
           <Button
             variant="outline"
             className="hidden lg:flex"
             onClick={() => table.setPageIndex(0)}
-            disabled={!table.getCanPreviousPage()}
+            disabled={!table.canPreviousPage}
           >
             <span className="sr-only">Go to first page</span>
             <ChevronsLeft />
@@ -60,7 +60,7 @@ export function DataTablePagination<TData>({
           <Button
             variant="outline"
             onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
+            disabled={!table.canPreviousPage}
           >
             <span className="sr-only">Go to previous page</span>
             <ChevronLeft />
@@ -68,7 +68,7 @@ export function DataTablePagination<TData>({
           <Button
             variant="outline"
             onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
+            disabled={!table.canNextPage}
           >
             <span className="sr-only">Go to next page</span>
             <ChevronLeft className="rotate-180" />
@@ -76,8 +76,8 @@ export function DataTablePagination<TData>({
           <Button
             variant="outline"
             className="hidden lg:flex"
-            onClick={() => table.setPageIndex(table.getPageCount() - 1)}
-            disabled={!table.getCanNextPage()}
+            onClick={() => table.setPageIndex(table.pageCount - 1)}
+            disabled={!table.canNextPage}
           >
             <span className="sr-only">Go to last page</span>
             <ChevronsLeft className="rotate-180" />

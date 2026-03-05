@@ -3,7 +3,9 @@ import type { DataSearch, DataTableOperator } from "../schema"
 
 export interface DataTableSearch {
   query: DataSearch
-  setQuery(search: Partial<DataSearch>): void
+  setQuery(search: Partial<DataSearch>, options?: {
+    resetPageIndex?: boolean
+  }): void
 }
 
 export interface DataTableRow<TData> {
@@ -93,11 +95,11 @@ export type DataTable<TData> = DataTableSearch & {
   } | undefined
   allColumns: DataTableColumn<TData>[]
   // pagination
-  getPageCount(): number
+  pageCount: number
   setPageSize(size: number): void
   setPageIndex(index: number): void
-  getCanPreviousPage(): boolean
+  canPreviousPage: boolean
   previousPage(): void
-  getCanNextPage(): boolean
+  canNextPage: boolean
   nextPage(): void
 }

@@ -102,7 +102,7 @@ function getDataTable<TData>({
             operator
           }
         }
-        navigate.setQuery({ filters: newFilters })
+        navigate.setQuery({ filters: newFilters }, { resetPageIndex: true })
       },
       facetedValues: (navigate.query.filters[column.id]?.value
         ? Array.isArray(navigate.query.filters[column.id].value)
@@ -138,14 +138,11 @@ function getDataTable<TData>({
             delete newFilters[column.id]
           }
         }
-        navigate.setQuery({ filters: newFilters })
+        navigate.setQuery({ filters: newFilters }, { resetPageIndex: true })
       }
     }
   }
-  const getPageCount = () => {
-    const limit = navigate.query.pagination.limit
-    return Math.ceil(total / limit)
-  }
+  const pageCount = Math.ceil(total / navigate.query.pagination.limit)
   return {
     ...navigate,
     name: props.name,
@@ -178,7 +175,7 @@ function getDataTable<TData>({
       })),
     },
     getColumn,
-    resetColumnFilters: () => navigate.setQuery({ filters: {}, search: {} }),
+    resetColumnFilters: () => navigate.setQuery({ filters: {}, search: {} }, { resetPageIndex: true }),
     getFilterableColumns: () => props.columns.filter(col => col.filter).map(col => ({
       column: getColumn(col.id)!,
       filter: {
@@ -204,7 +201,7 @@ function getDataTable<TData>({
       }
     },
     allColumns: props.columns.map(col => getColumn(col.id)!),
-    getPageCount,
+    pageCount,
     setPageSize: (size) => {
       navigate.setQuery({
         pagination: {
@@ -222,7 +219,7 @@ function getDataTable<TData>({
         }
       })
     },
-    getCanPreviousPage: () => navigate.query.pagination.index > 0,
+    canPreviousPage: navigate.query.pagination.index > 0,
     previousPage: () => {
       if (navigate.query.pagination.index > 0) {
         navigate.setQuery({
@@ -233,12 +230,8 @@ function getDataTable<TData>({
         })
       }
     },
-    getCanNextPage: () => {
-      const pageCount = getPageCount()
-      return navigate.query.pagination.index < pageCount - 1
-    },
+    canNextPage: navigate.query.pagination.index < pageCount - 1,
     nextPage: () => {
-      const pageCount = getPageCount()
       if (navigate.query.pagination.index < pageCount - 1) {
         navigate.setQuery({
           pagination: {
@@ -259,12 +252,19 @@ export function DataTable<TData>(props: DataTableProps<TData>) {
   const query = toDataSearchSchema(props.search)
   const navigate: DataTableSearch = {
     query,
-    setQuery(search) {
+    setQuery(search, options) {
+      const values: DataSearch = {
+        ...query,
+        ...search
+      }
       props.navigate({
         // @ts-ignore
         search: toURLSearchParams({
-          ...query,
-          ...search
+          ...values,
+          pagination: options?.resetPageIndex ? {
+            ...values.pagination,
+            index: 0,
+          } : values.pagination
         }),
       })
     }
