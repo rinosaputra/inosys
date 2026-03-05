@@ -12,35 +12,43 @@ import { Ellipsis, type LucideIcon } from "lucide-react"
 import { Link } from "@tanstack/react-router"
 import type { DataTableRow } from "./types"
 
-type DataTableAction<TData> = (row: TData) => void | string
 
-interface DataTableCustomActionProps<TData> {
+type DataTableCustomActionProps<TData> = {
   label: string
-  onClick: DataTableAction<TData>
   icon?: LucideIcon
   variant?: "default" | "destructive"
   shortcut?: string
-}
+} & ({
+  type: "link"
+  payload: string
+} | {
+  type: "action"
+  payload: (row: TData) => void
+} | {
+  type: "custom"
+  payload: any
+})
 
 const DataTableCustomAction = <TData,>({
   label,
-  onClick,
+  type,
+  payload,
   icon: Icon,
   variant = "default",
   shortcut,
 }: DataTableCustomActionProps<TData>) => {
-  if (typeof onClick === "string") {
+  if (type === "link") {
     return (<DropdownMenuItem variant={variant} asChild>
-      <Link to={onClick}>
+      <Link to={payload}>
         {Icon && <Icon />}
         {label}
         {shortcut && <DropdownMenuShortcut>{shortcut}</DropdownMenuShortcut>}
       </Link>
     </DropdownMenuItem>)
   }
-  if (typeof onClick === "function") {
+  if (type === "action") {
     // @ts-ignore
-    return (<DropdownMenuItem onClick={onClick} variant={variant}>
+    return (<DropdownMenuItem onClick={payload} variant={variant}>
       {Icon && <Icon />}
       {label}
       {shortcut && <DropdownMenuShortcut>{shortcut}</DropdownMenuShortcut>}
@@ -49,11 +57,11 @@ const DataTableCustomAction = <TData,>({
   return null
 }
 
-interface DataTableRowActionsProps<TData> {
+export interface DataTableRowActionsProps<TData> {
   row: DataTableRow<TData>
-  onEdit?: DataTableAction<TData>
-  onDelete?: DataTableAction<TData>
-  onView?: DataTableAction<TData>
+  onEdit?(row: TData): void
+  onDelete?(row: TData): void
+  onView?(row: TData): void
   customActions?: DataTableCustomActionProps<TData>[]
   disabled: boolean
 }
@@ -79,9 +87,9 @@ export function DataTableRowActions<TData>({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-40">
-        {onView && <DataTableCustomAction label="View" onClick={() => onView(row.original)} />}
-        {onEdit && <DataTableCustomAction label="Edit" onClick={() => onEdit(row.original)} />}
-        {customActions.length > 0 && <DropdownMenuSeparator />}
+        {onView && <DataTableCustomAction label="View" type="action" payload={() => onView(row.original)} />}
+        {onEdit && <DataTableCustomAction label="Edit" type="action" payload={() => onEdit(row.original)} />}
+        {(onView || onEdit) && customActions.length > 0 && <DropdownMenuSeparator />}
         {customActions.map((action, index) => (
           <DataTableCustomAction
             key={index}
@@ -89,8 +97,8 @@ export function DataTableRowActions<TData>({
         ))}
         {onDelete && (
           <>
-            <DropdownMenuSeparator />
-            <DataTableCustomAction label="Delete" onClick={() => onDelete(row.original)} variant="destructive" />
+            {(onView || onEdit || customActions.length > 0) && <DropdownMenuSeparator />}
+            <DataTableCustomAction label="Delete" type="action" payload={() => onDelete(row.original)} variant="destructive" />
           </>
         )}
       </DropdownMenuContent>

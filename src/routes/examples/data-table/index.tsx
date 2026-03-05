@@ -59,7 +59,22 @@ function RouteComponent() {
         getFacets: async () => {
           const facets = await orpc.examples.dataTable.facets.call()
           return facets
-        }
+        },
+        showRowNumber: true,
+        rowActions: (row) => ({
+          customActions: [
+            {
+              label: "This is a link",
+              type: "link",
+              payload: `#`,
+            },
+            {
+              label: "This is an action",
+              type: "action",
+              payload: () => alert(`Message sent to ${row.original.name}`)
+            }
+          ]
+        }),
       }} />
     </section>
   </div>)

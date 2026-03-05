@@ -70,6 +70,7 @@ export interface DataTableColumn<TData> {
 export type DataTable<TData> = DataTableSearch & {
   name: string
   isLoading: boolean
+  total: number
   headerGroups: {
     id: string
     headers: {

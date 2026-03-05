@@ -9,13 +9,14 @@ import {
 
 import { DataTablePagination } from "./data-table-pagination"
 import { DataTableToolbar } from "./data-table-toolbar"
-import type { DataTable, DataTableColumnDef, DataTableSearch } from "./types"
+import type { DataTable, DataTableColumnDef, DataTableRow, DataTableSearch } from "./types"
 import _ from "lodash"
 import type { UseNavigateResult } from "@tanstack/react-router"
 import { toDataSearchSchema, toURLSearchParams, type DataSearch } from "../schema"
 import { DataTableColumnHeader } from "./data-table-column-header"
 import { useQuery } from "@tanstack/react-query"
 import { toast } from "sonner"
+import { DataTableRowActions, type DataTableRowActionsProps } from "./data-table-row-actions"
 
 export const getDataTableQueryKey = <T,>(name: T, ...props: unknown[]) => {
   return ["data-table", name, ...props] as const
@@ -24,6 +25,9 @@ export const getDataTableQueryKey = <T,>(name: T, ...props: unknown[]) => {
 interface DataTableProps<TData> {
   name: string
   columns: DataTableColumnDef<TData>[]
+  showRowNumber?: boolean
+  rowActions?(row: DataTableRow<TData>): Omit<DataTableRowActionsProps<TData>, "row" | "disabled">
+
 
   // function to fetch data based on the current search state
   getData(query: DataSearch): Promise<TData[]>
@@ -147,6 +151,7 @@ function getDataTable<TData>({
     ...navigate,
     name: props.name,
     isLoading,
+    total,
     headerGroups: [{
       id: "header",
       headers: props.columns
@@ -308,7 +313,6 @@ export function DataTable<TData>(props: DataTableProps<TData>) {
     queryFn: async () => {
       if (!props.getFacets) return {}
       try {
-
         const facets = await props.getFacets()
         return facets
       } catch (error) {
@@ -338,6 +342,9 @@ export function DataTable<TData>(props: DataTableProps<TData>) {
           <TableHeader>
             {table.headerGroups.map((headerGroup) => (
               <TableRow key={headerGroup.id}>
+                {props.showRowNumber && (
+                  <TableHead className="w-12 text-center">#</TableHead>
+                )}
                 {headerGroup.headers.map((header) => {
                   return (
                     <TableHead key={header.id} colSpan={header.colSpan}>
@@ -351,27 +358,42 @@ export function DataTable<TData>(props: DataTableProps<TData>) {
                     </TableHead>
                   )
                 })}
+                {props.rowActions && <TableHead className="w-10" />}
               </TableRow>
             ))}
           </TableHeader>
           <TableBody>
             {table.rowModel.rows?.length ? (
-              table.rowModel.rows.map((row) => (
+              table.rowModel.rows.map((row, index) => (
                 <TableRow
                   key={row.id}
                   data-state={row.isSelected && "selected"}
                 >
+                  {props.showRowNumber && (
+                    <TableCell className="w-12 text-center">
+                      {index + 1 + table.query.pagination.index * table.query.pagination.limit}
+                    </TableCell>
+                  )}
                   {row.visibleCells.map((cell) => (
                     <TableCell key={cell.id}>
                       {cell.column.columnDef.cell({ row })}
                     </TableCell>
                   ))}
+                  {props.rowActions && (
+                    <TableCell className="w-10">
+                      <DataTableRowActions
+                        {...props.rowActions(row)}
+                        row={row}
+                        disabled={table.isLoading}
+                      />
+                    </TableCell>
+                  )}
                 </TableRow>
               ))
             ) : (
               <TableRow>
                 <TableCell
-                  colSpan={props.columns.length}
+                  colSpan={props.columns.length + (props.showRowNumber ? 1 : 0) + (props.rowActions ? 1 : 0)}
                   className="h-24 text-center"
                 >
                   No results.
