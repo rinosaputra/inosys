@@ -14,9 +14,7 @@ export interface DataTableRow<TData> {
   getVisibleCells(): {
     id: string
     column: {
-      columnDef: {
-        cell: TData
-      }
+      columnDef: DataTableColumnDef<TData>
     }
   }[]
 }
@@ -69,8 +67,9 @@ export interface DataTableColumn<TData> {
   setFacetedValue(value: string): void
 }
 
-export type DataTable<TData> = {
+export type DataTable<TData> = DataTableSearch & {
   name: string
+  isLoading: boolean
   getHeaderGroups: () => {
     id: string
     headers: {
@@ -96,4 +95,12 @@ export type DataTable<TData> = {
     placeholder: string
   } | undefined
   getAllColumns(): DataTableColumn<TData>[]
+  // pagination
+  getPageCount(): number
+  setPageSize(size: number): void
+  setPageIndex(index: number): void
+  getCanPreviousPage(): boolean
+  previousPage(): void
+  getCanNextPage(): boolean
+  nextPage(): void
 }

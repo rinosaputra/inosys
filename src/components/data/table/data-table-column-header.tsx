@@ -14,12 +14,14 @@ interface DataTableColumnHeaderProps<TData>
   extends React.HTMLAttributes<HTMLDivElement> {
   column: DataTableColumn<TData>
   title: string
+  disabled: boolean
 }
 
 export function DataTableColumnHeader<TData>({
   column,
   title,
   className,
+  disabled
 }: DataTableColumnHeaderProps<TData>) {
   if (!column.getCanSort() && !column.getCanHide()) {
     return <div className={cn(className)}>{title}</div>
@@ -33,6 +35,7 @@ export function DataTableColumnHeader<TData>({
             variant="ghost"
             size="sm"
             className="-ml-3 h-8 data-[state=open]:bg-accent"
+            disabled={disabled}
           >
             <span>{title}</span>
             {column.getIsSorted() === "desc" ? (

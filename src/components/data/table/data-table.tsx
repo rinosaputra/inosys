@@ -12,21 +12,35 @@ import { DataTableToolbar } from "./data-table-toolbar"
 import type { DataTable, DataTableColumnDef, DataTableSearch } from "./types"
 import _ from "lodash"
 import type { UseNavigateResult } from "@tanstack/react-router"
-import { toDataSearchSchema, toURLSearchParams } from "../schema"
+import { toDataSearchSchema, toURLSearchParams, type DataSearch } from "../schema"
 import { DataTableColumnHeader } from "./data-table-column-header"
+import { useQuery } from "@tanstack/react-query"
+import { getDataTableQueryKey } from "./utils"
 
 interface DataTableProps<TData> {
   name: string
   columns: DataTableColumnDef<TData>[]
-  data: TData[]
-  pageCount: number
+  getData(query: DataSearch): Promise<TData[]>
+  getCount(query: DataSearch): Promise<number>
 
   // Search & Navigation from tanstack router
   search: Record<string, string>
   navigate: UseNavigateResult<any>
 }
 
-function getDataTable<TData>(props: DataTableProps<TData>, navigate: DataTableSearch): DataTable<TData> {
+function getDataTable<TData>({
+  navigate,
+  props,
+  isLoading,
+  total = 0,
+  data = []
+}: {
+  props: DataTableProps<TData>,
+  navigate: DataTableSearch
+  isLoading: boolean
+  total?: number
+  data?: TData[]
+}): DataTable<TData> {
   const getColumn: DataTable<TData>["getColumn"] = (columnId) => {
     const column = props.columns.find((col) => col.id === columnId)
     if (!column) return undefined
@@ -100,8 +114,8 @@ function getDataTable<TData>(props: DataTableProps<TData>, navigate: DataTableSe
         } else {
           const currentValues = (
             Array.isArray(newFilters[column.id].value)
-            ? newFilters[column.id].value
-            : [newFilters[column.id].value]
+              ? newFilters[column.id].value
+              : [newFilters[column.id].value]
           ) as string[]
           const existingIndex = currentValues.indexOf(value)
           if (existingIndex > -1) {
@@ -118,8 +132,14 @@ function getDataTable<TData>(props: DataTableProps<TData>, navigate: DataTableSe
       }
     }
   }
+  const getPageCount = () => {
+    const limit = navigate.getQuery().pagination.limit
+    return Math.ceil(total / limit)
+  }
   return {
+    ...navigate,
     name: props.name,
+    isLoading,
     getHeaderGroups: () => [{
       id: "header",
       headers: props.columns.map((column) => ({
@@ -130,7 +150,7 @@ function getDataTable<TData>(props: DataTableProps<TData>, navigate: DataTableSe
       })),
     }],
     getRowModel: () => ({
-      rows: props.data.map((row, index) => ({
+      rows: data.map((row, index) => ({
         id: String(index),
         original: row,
         getValue: (columnId: string) => _.get(row, columnId),
@@ -139,9 +159,7 @@ function getDataTable<TData>(props: DataTableProps<TData>, navigate: DataTableSe
           props.columns.map((column) => ({
             id: `${String(index)}-${column.id}`,
             column: {
-              columnDef: {
-                cell: row,
-              }
+              columnDef: column
             },
           })),
       })),
@@ -164,13 +182,57 @@ function getDataTable<TData>(props: DataTableProps<TData>, navigate: DataTableSe
         placeholder: column.searchable?.placeholder || `Search ${column.label}...`
       }
     },
-    getAllColumns: () => props.columns.map(col => getColumn(col.id)!)
+    getAllColumns: () => props.columns.map(col => getColumn(col.id)!),
+    getPageCount,
+    setPageSize: (size) => {
+      navigate.setQuery({
+        pagination: {
+          ...navigate.getQuery().pagination,
+          limit: size,
+          index: 0, // reset to first page when page size changes
+        }
+      })
+    },
+    setPageIndex: (index) => {
+      navigate.setQuery({
+        pagination: {
+          ...navigate.getQuery().pagination,
+          index,
+        }
+      })
+    },
+    getCanPreviousPage: () => navigate.getQuery().pagination.index > 0,
+    previousPage: () => {
+      if (navigate.getQuery().pagination.index > 0) {
+        navigate.setQuery({
+          pagination: {
+            ...navigate.getQuery().pagination,
+            index: navigate.getQuery().pagination.index - 1,
+          }
+        })
+      }
+    },
+    getCanNextPage: () => {
+      const pageCount = getPageCount()
+      return navigate.getQuery().pagination.index < pageCount - 1
+    },
+    nextPage: () => {
+      const pageCount = getPageCount()
+      if (navigate.getQuery().pagination.index < pageCount - 1) {
+        navigate.setQuery({
+          pagination: {
+            ...navigate.getQuery().pagination,
+            index: navigate.getQuery().pagination.index + 1,
+          }
+        })
+      }
+    }
   }
 }
 
-function flexRender(content: any) {
-  return content
-}
+// function flexRender(content: any) {
+//   return content
+// }
 
 export function DataTable<TData>(props: DataTableProps<TData>) {
   const navigate: DataTableSearch = {
@@ -187,7 +249,31 @@ export function DataTable<TData>(props: DataTableProps<TData>) {
       })
     }
   }
-  const table = getDataTable(props, navigate)
+  const data = useQuery({
+    queryKey: getDataTableQueryKey(props.name, "data", props.search),
+    queryFn: async () => {
+      const data = await props.getData(navigate.getQuery())
+      return data
+    },
+    // keepPreviousData: true,
+    // Refetch data when filters or sorting change
+    refetchOnWindowFocus: false,
+  })
+  const total = useQuery({
+    queryKey: getDataTableQueryKey(props.name, "count", props.search),
+    queryFn: async () => {
+      const count = await props.getCount(navigate.getQuery())
+      return count
+    },
+    refetchOnWindowFocus: false,
+  })
+  const table = getDataTable({
+    props,
+    navigate,
+    isLoading: data.isLoading || total.isLoading,
+    total: total.data ?? 0,
+    data: data.data ?? []
+  })
 
 
   return (
@@ -206,6 +292,7 @@ export function DataTable<TData>(props: DataTableProps<TData>) {
                         : <DataTableColumnHeader
                           column={header.column}
                           title={header.column.columnDef.header.label}
+                          disabled={table.isLoading}
                         />}
                     </TableHead>
                   )
@@ -222,10 +309,7 @@ export function DataTable<TData>(props: DataTableProps<TData>) {
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        // cell.getContext()
-                      )}
+                      {cell.column.columnDef.cell({ row })}
                     </TableCell>
                   ))}
                 </TableRow>

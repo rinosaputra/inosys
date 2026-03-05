@@ -1,7 +1,6 @@
 import { Badge } from "@/components/ui/badge"
-import { DataTableColumnHeader } from "#/components/data/table/data-table-column-header"
+import type { DataTableColumnDef } from "../../../../components/data/table/types"
 import type { UserRow } from "./schema"
-import type { DataTableColumnDef } from "../types"
 
 const roles: UserRow["role"][] = ["member", "admin", "superadmin"]
 const statuses: UserRow["status"][] = ["active", "banned"]
@@ -11,6 +10,9 @@ export const userColumns: DataTableColumnDef<UserRow>[] = [
     id: "name",
     label: "Name",
     cell: ({ row }) => <div className="font-medium">{row.getValue("name")}</div>,
+    searchable: {
+      placeholder: "Search by name"
+    }
   },
   {
     id: "email",

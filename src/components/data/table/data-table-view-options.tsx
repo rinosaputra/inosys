@@ -17,6 +17,9 @@ interface DataTableViewOptionsProps<TData> {
 export function DataTableViewOptions<TData>({
   table,
 }: DataTableViewOptionsProps<TData>) {
+  if (table.getAllColumns().filter(column => column.getCanHide()).length === 0) {
+    return null
+  }
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -24,6 +27,7 @@ export function DataTableViewOptions<TData>({
           variant="outline"
           size="sm"
           className="ml-auto hidden h-8 lg:flex"
+          disabled={table.isLoading}
         >
           <Layers />
           View

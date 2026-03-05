@@ -26,7 +26,7 @@ export const dataSearchSchema = z.object({
     })
     .catch({
       index: 0,
-      limit: 100,
+      limit: 10,
     }),
 
   // optional: column-specific search (override q semantics if you want)
@@ -56,7 +56,7 @@ export function toDataSearchSchema(input: Record<string, string>): DataSearch {
   const defaultSearch: DataSearch = {
     pagination: {
       index: 0,
-      limit: 100,
+      limit: 10,
     },
     search: {},
     sorts: {},

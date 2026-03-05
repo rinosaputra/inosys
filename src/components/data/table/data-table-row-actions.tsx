@@ -1,5 +1,4 @@
 
-import type { Row } from "@tanstack/react-table"
 import { Button } from "#/components/ui/button"
 import {
   DropdownMenu,
@@ -11,6 +10,7 @@ import {
 } from "#/components/ui/dropdown-menu"
 import { Ellipsis, type LucideIcon } from "lucide-react"
 import { Link } from "@tanstack/react-router"
+import type { DataTableRow } from "./types"
 
 type DataTableAction<TData> = (row: TData) => void | string
 
@@ -50,11 +50,12 @@ const DataTableCustomAction = <TData,>({
 }
 
 interface DataTableRowActionsProps<TData> {
-  row: Row<TData>
+  row: DataTableRow<TData>
   onEdit?: DataTableAction<TData>
   onDelete?: DataTableAction<TData>
   onView?: DataTableAction<TData>
   customActions?: DataTableCustomActionProps<TData>[]
+  disabled: boolean
 }
 
 export function DataTableRowActions<TData>({
@@ -63,6 +64,7 @@ export function DataTableRowActions<TData>({
   onDelete,
   onView,
   customActions = [],
+  disabled
 }: DataTableRowActionsProps<TData>) {
   return (
     <DropdownMenu>
@@ -70,6 +72,7 @@ export function DataTableRowActions<TData>({
         <Button
           variant="ghost"
           className="data-[state=open]:bg-muted"
+          disabled={disabled}
         >
           <Ellipsis />
           <span className="sr-only">Open menu</span>

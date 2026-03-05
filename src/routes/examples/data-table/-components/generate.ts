@@ -1,8 +1,8 @@
-// src/components/data-table/example/schema.ts
 import { faker } from "@faker-js/faker"
+import { writeFileSync } from "fs"
 import z from "zod"
 
-export const userRowSchema = z.object({
+const userRowSchema = z.object({
   id: z.string(),
   name: z.string(),
   email: z.email(),
@@ -12,12 +12,14 @@ export const userRowSchema = z.object({
   createdAt: z.iso.datetime()
 })
 
-export type UserRow = z.infer<typeof userRowSchema>
+type UserRow = z.infer<typeof userRowSchema>
+
+
 
 const roles: UserRow["role"][] = ["member", "admin", "superadmin"]
 const statuses: UserRow["status"][] = ["active", "banned"]
 
-export function makeUserRow(overrides: Partial<UserRow> = {}): UserRow {
+function makeUserRow(overrides: Partial<UserRow> = {}): UserRow {
   const row: UserRow = {
     id: faker.string.uuid(),
     name: faker.person.fullName(),
@@ -37,6 +39,16 @@ export function makeUserRow(overrides: Partial<UserRow> = {}): UserRow {
   return userRowSchema.parse(row)
 }
 
-export function makeUserRows(count = 50): UserRow[] {
+function makeUserRows(count = 50): UserRow[] {
   return Array.from({ length: count }, () => makeUserRow())
 }
+
+// Write the data to a JSON file
+try {
+  writeFileSync('./.generated/users.json', JSON.stringify({ data: makeUserRows(100) }, null, 2));
+  console.log('Successfully wrote fake user data to users.json');
+} catch (err) {
+  console.error('Error writing file:', err);
+}
+
+// you can run: npx ts-node src/routes/examples/data-table/-components/generate.ts

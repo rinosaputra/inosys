@@ -49,6 +49,7 @@
     "@types/react-dom": "^19.2.0",
     "@vitejs/plugin-react": "^5.0.4",
     "jsdom": "^27.0.0",
+    "lowdb": "^7.0.1",
     "prettier": "^3.5.3",
     "remark-gfm": "^4.0.1",
     "shadcn": "^3.8.5",

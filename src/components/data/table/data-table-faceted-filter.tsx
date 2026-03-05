@@ -19,26 +19,29 @@ import { Separator } from "#/components/ui/separator"
 import { Check, PlusCircle } from "lucide-react"
 import type { DataTableColumn, DataTableFilter, DataTableFnFacet } from "./types"
 import { useQuery } from "@tanstack/react-query"
+import { getDataTableQueryKey } from "./utils"
 
 interface DataTableFacetedFilterProps<TData> {
   name: string
   column: DataTableColumn<TData>
   filter: DataTableFilter
   fnFacet: DataTableFnFacet
+  disabled: boolean
 }
 
 export function DataTableFacetedFilter<TData>({
   name,
   column,
   filter,
-  fnFacet
+  fnFacet,
+  disabled
 
 }: DataTableFacetedFilterProps<TData>) {
   // const facets = column?.getFacetedUniqueValues()
   // const selectedValues = new Set(column?.getFilterValue() as string[])
   const selectedValues = column.getFacetedValues()
   const { data: facetData = [], isLoading } = useQuery({
-    queryKey: ["data-table", name, "facets", column.id],
+    queryKey: getDataTableQueryKey(name, "facets", column.id),
     queryFn: async () => {
       const data = await fnFacet()
       return filter.options.map(option => ({
@@ -52,7 +55,7 @@ export function DataTableFacetedFilter<TData>({
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant="outline" size="sm" className="h-8 border-dashed" disabled={isLoading}>
+        <Button variant="outline" size="sm" className="h-8 border-dashed" disabled={isLoading || disabled}>
           <PlusCircle />
           {filter.label}
           {selectedValues.length > 0 && (

@@ -7,17 +7,6 @@ import type { DataTable } from "./types"
 
 interface DataTableToolbarProps<TData> {
   table: DataTable<TData>
-  // searchKey?: string
-  // searchPlaceholder?: string
-  // filterableColumns?: {
-  //   id: string
-  //   title: string
-  //   options: {
-  //     label: string
-  //     value: string
-  //     icon?: React.ComponentType<{ className?: string }>
-  //   }[]
-  // }[]
 }
 
 export function DataTableToolbar<TData>({
@@ -39,11 +28,13 @@ export function DataTableToolbar<TData>({
               searchableColumn.column.setFilterValue(event.target.value)
             }
             className="h-8 w-37.5 lg:w-62.5"
+            disabled={table.isLoading}
           />
         )}
         {table.getFilterableColumns().map(
           (props) =>
             <DataTableFacetedFilter
+              disabled={table.isLoading}
               key={props.column.id}
               name={table.name}
               {...props}
@@ -53,6 +44,7 @@ export function DataTableToolbar<TData>({
           <Button
             variant="ghost"
             onClick={() => table.resetColumnFilters()}
+            disabled={table.isLoading}
           >
             Reset
             <RefreshCw />
