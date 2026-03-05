@@ -41,6 +41,10 @@ function RouteComponent() {
             status: statusEnum.array().parse(query.filters.status || []),
           })
           return Math.ceil(total / query.pagination.limit)
+        },
+        getFacets: async () => {
+          const facets = await orpc.examples.dataTable.facets.call()
+          return facets
         }
       }} />
     </section>

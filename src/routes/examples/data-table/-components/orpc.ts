@@ -68,6 +68,24 @@ const orpcExampleDataTable = {
       let filteredData = getFilteredData(data, input)
 
       return filteredData.length
+    }),
+  facets: base
+    .handler(async ({ context }) => {
+      await context.users.read()
+      const filteredData = context.users.data.data || []
+
+      const roleFacet: Record<string, number> = {}
+      const statusFacet: Record<string, number> = {}
+
+      filteredData.forEach(user => {
+        roleFacet[user.role] = (roleFacet[user.role] || 0) + 1
+        statusFacet[user.status] = (statusFacet[user.status] || 0) + 1
+      })
+
+      return {
+        role: roleFacet,
+        status: statusFacet
+      }
     })
 }
 

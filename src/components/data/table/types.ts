@@ -25,10 +25,9 @@ export interface DataTableFilter {
     label: string
     value: string
     icon?: LucideIcon
+    count?: number
   }[]
 }
-
-export type DataTableFnFacet = () => Promise<Record<string, number>>
 
 export interface DataTableColumnDef<TData> {
   id: string
@@ -46,7 +45,6 @@ export interface DataTableColumnDef<TData> {
     placeholder?: string
   }
   filter?: DataTableFilter
-  fnFacet?: DataTableFnFacet
 }
 
 export interface DataTableColumn<TData> {
@@ -87,7 +85,6 @@ export type DataTable<TData> = DataTableSearch & {
   getFilterableColumns(): {
     column: DataTableColumn<TData>
     filter: DataTableFilter
-    fnFacet: DataTableFnFacet
   }[]
   getColumnFilters(): string[]
   getSearchableColumn(name?: string): {

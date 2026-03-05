@@ -15,13 +15,19 @@ import type { UseNavigateResult } from "@tanstack/react-router"
 import { toDataSearchSchema, toURLSearchParams, type DataSearch } from "../schema"
 import { DataTableColumnHeader } from "./data-table-column-header"
 import { useQuery } from "@tanstack/react-query"
-import { getDataTableQueryKey } from "./utils"
+
+export const getDataTableQueryKey = <T,>(name: T, ...props: unknown[]) => {
+  return ["data-table", name, ...props] as const
+}
 
 interface DataTableProps<TData> {
   name: string
   columns: DataTableColumnDef<TData>[]
+
+  // function to fetch data based on the current search state
   getData(query: DataSearch): Promise<TData[]>
   getCount(query: DataSearch): Promise<number>
+  getFacets?(): Promise<Record<string, Record<string, number>>>
 
   // Search & Navigation from tanstack router
   search: Record<string, string>
@@ -32,14 +38,16 @@ function getDataTable<TData>({
   navigate,
   props,
   isLoading,
-  total = 0,
-  data = []
+  total,
+  data,
+  fasets
 }: {
   props: DataTableProps<TData>,
   navigate: DataTableSearch
   isLoading: boolean
-  total?: number
-  data?: TData[]
+  total: number
+  data: TData[]
+  fasets: Record<string, Record<string, number>>
 }): DataTable<TData> {
   const getColumn: DataTable<TData>["getColumn"] = (columnId) => {
     const column = props.columns.find((col) => col.id === columnId)
@@ -166,10 +174,15 @@ function getDataTable<TData>({
     }),
     getColumn,
     resetColumnFilters: () => navigate.setQuery({ filters: {} }),
-    getFilterableColumns: () => props.columns.filter(col => col.filter && col.fnFacet).map(col => ({
+    getFilterableColumns: () => props.columns.filter(col => col.filter).map(col => ({
       column: getColumn(col.id)!,
-      filter: col.filter!,
-      fnFacet: col.fnFacet!
+      filter: {
+        ...col.filter!,
+        options: col.filter!.options.map(option => ({
+          ...option,
+          count: fasets[col.id]?.[option.value] || 0
+        }))
+      },
     })),
     getColumnFilters: () => Object.keys(navigate.getQuery().filters),
     getSearchableColumn: (name) => {
@@ -249,6 +262,14 @@ export function DataTable<TData>(props: DataTableProps<TData>) {
       })
     }
   }
+  const total = useQuery({
+    queryKey: getDataTableQueryKey(props.name, "count", props.search),
+    queryFn: async () => {
+      const count = await props.getCount(navigate.getQuery())
+      return count
+    },
+    refetchOnWindowFocus: false,
+  })
   const data = useQuery({
     queryKey: getDataTableQueryKey(props.name, "data", props.search),
     queryFn: async () => {
@@ -258,21 +279,25 @@ export function DataTable<TData>(props: DataTableProps<TData>) {
     // keepPreviousData: true,
     // Refetch data when filters or sorting change
     refetchOnWindowFocus: false,
+    enabled: total.data !== 0, // Only fetch data if there are results to show
   })
-  const total = useQuery({
-    queryKey: getDataTableQueryKey(props.name, "count", props.search),
+  const facets = useQuery({
+    queryKey: getDataTableQueryKey(props.name, "facets"),
     queryFn: async () => {
-      const count = await props.getCount(navigate.getQuery())
-      return count
+      if (!props.getFacets) return {}
+      const facets = await props.getFacets()
+      return facets
     },
     refetchOnWindowFocus: false,
+    enabled: total.data !== 0 && !!props.getFacets, // Only fetch facets if there are results to show
   })
   const table = getDataTable({
     props,
     navigate,
-    isLoading: data.isLoading || total.isLoading,
+    isLoading: total.isLoading || data.isLoading || facets.isLoading,
     total: total.data ?? 0,
-    data: data.data ?? []
+    data: data.data ?? [],
+    fasets: facets.data ?? {}
   })
 
 
