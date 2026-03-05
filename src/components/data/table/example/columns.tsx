@@ -9,19 +9,19 @@ const statuses: UserRow["status"][] = ["active", "banned"]
 export const userColumns: DataTableColumnDef<UserRow>[] = [
   {
     id: "name",
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Name" />,
+    label: "Name",
     cell: ({ row }) => <div className="font-medium">{row.getValue("name")}</div>,
   },
   {
     id: "email",
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Email" />,
+    label: "Email",
     cell: ({ row }) => <div className="text-muted-foreground">{row.getValue("email")}</div>,
   },
   {
     id: "role",
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Role" />,
+    label: "Role",
     cell: ({ row }) => <Badge variant="outline">{row.getValue("role")}</Badge>,
-    faceted: {
+    filter: {
       label: "Role",
       options: roles.map((role) => ({
         label: role.charAt(0).toUpperCase() + role.slice(1),
@@ -31,9 +31,9 @@ export const userColumns: DataTableColumnDef<UserRow>[] = [
   },
   {
     id: "status",
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Status" />,
+    label: "Status",
     cell: ({ row }) => <Badge variant="secondary">{row.getValue("status")}</Badge>,
-    faceted: {
+    filter: {
       label: "Status",
       options: statuses.map((status) => ({
         label: status.charAt(0).toUpperCase() + status.slice(1),
@@ -43,12 +43,12 @@ export const userColumns: DataTableColumnDef<UserRow>[] = [
   },
   {
     id: "lastSeenAt",
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Last Seen" />,
+    label: "Last Seen",
     cell: ({ row }) => new Date(row.getValue("lastSeenAt")).toLocaleString(),
   },
   {
     id: "createdAt",
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Created" />,
+    label: "Created",
     cell: ({ row }) => new Date(row.getValue("createdAt")).toLocaleDateString(),
   },
 ]

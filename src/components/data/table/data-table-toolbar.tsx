@@ -3,58 +3,51 @@ import { Input } from "@/components/ui/input"
 import { DataTableViewOptions } from "./data-table-view-options"
 import { DataTableFacetedFilter } from "./data-table-faceted-filter"
 import { RefreshCw } from "lucide-react"
-import type { DataTableSearch } from "./types"
-import { useDebounce } from "#/hooks/use-debounce"
+import type { DataTable } from "./types"
 
-interface DataTableToolbarFilter {
-  id: string
-  title: string
-  options: {
-    label: string
-    value: string
-    icon?: React.ComponentType<{ className?: string }>
-  }[]
+interface DataTableToolbarProps<TData> {
+  table: DataTable<TData>
+  // searchKey?: string
+  // searchPlaceholder?: string
+  // filterableColumns?: {
+  //   id: string
+  //   title: string
+  //   options: {
+  //     label: string
+  //     value: string
+  //     icon?: React.ComponentType<{ className?: string }>
+  //   }[]
+  // }[]
 }
 
-export interface DataTableToolbarProps {
-  searchPlaceholder?: string
-  filterableColumns?: DataTableToolbarFilter[]
-}
-
-export function DataTableToolbar({
-  searchPlaceholder = "Search...",
-  filterableColumns = [],
-  search,
-  setSearch
-}: DataTableToolbarProps & DataTableSearch) {
-  const isFiltered = !!search.search || Object.keys(search.filters).length > 0
-  const onChangeQ = useDebounce((value: string) => {
-    setSearch(() => value)
-  }, 500)
+export function DataTableToolbar<TData>({
+  table
+}: DataTableToolbarProps<TData>) {
+  const isFiltered = table.getColumnFilters().length > 0
+  const searchableColumn = table.getSearchableColumn()
 
   return (
     <div className="flex items-center justify-between">
       <div className="flex flex-1 items-center space-x-2">
-        {search.search && (
+        {searchableColumn && (
           <Input
-            placeholder={searchPlaceholder}
-            value={search.search.value}
+            placeholder={searchableColumn.placeholder}
+            value={
+              (searchableColumn.column.getFilterValue() as string) ?? ""
+            }
             onChange={(event) =>
-              table.getColumn(searchKey)?.setFilterValue(event.target.value)
+              searchableColumn.column.setFilterValue(event.target.value)
             }
             className="h-8 w-37.5 lg:w-62.5"
           />
         )}
-        {filterableColumns.map(
-          (column) =>
-            table.getColumn(column.id) && (
-              <DataTableFacetedFilter
-                key={column.id}
-                column={table.getColumn(column.id)}
-                title={column.title}
-                options={column.options}
-              />
-            )
+        {table.getFilterableColumns().map(
+          (props) =>
+            <DataTableFacetedFilter
+              key={props.column.id}
+              name={table.name}
+              {...props}
+            />
         )}
         {isFiltered && (
           <Button

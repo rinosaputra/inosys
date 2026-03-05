@@ -21,7 +21,7 @@ export function DataTableColumnHeader<TData>({
   title,
   className,
 }: DataTableColumnHeaderProps<TData>) {
-  if (!column.getCanSort()) {
+  if (!column.getCanSort() && !column.getCanHide()) {
     return <div className={cn(className)}>{title}</div>
   }
 
@@ -45,19 +45,23 @@ export function DataTableColumnHeader<TData>({
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="start">
-          <DropdownMenuItem onClick={() => column.toggleSorting(false)}>
-            <ArrowDown className="text-muted-foreground/70 rotate-180" />
-            Asc
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => column.toggleSorting(true)}>
-            <ArrowDown className="text-muted-foreground/70" />
-            Desc
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={() => column.toggleVisibility(false)}>
-            <EyeClosed className="text-muted-foreground/70" />
-            Hide
-          </DropdownMenuItem>
+          {column.getCanSort() && (<>
+            <DropdownMenuItem onClick={() => column.toggleSorting(false)}>
+              <ArrowDown className="text-muted-foreground/70 rotate-180" />
+              Asc
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => column.toggleSorting(true)}>
+              <ArrowDown className="text-muted-foreground/70" />
+              Desc
+            </DropdownMenuItem>
+          </>)}
+          {column.getCanHide() && (<>
+            {column.getCanSort() && <DropdownMenuSeparator />}
+            <DropdownMenuItem onClick={() => column.toggleVisibility(false)}>
+              <EyeClosed className="text-muted-foreground/70" />
+              Hide
+            </DropdownMenuItem>
+          </>)}
         </DropdownMenuContent>
       </DropdownMenu>
     </div>

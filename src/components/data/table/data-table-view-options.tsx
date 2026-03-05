@@ -1,6 +1,4 @@
 import { DropdownMenuTrigger } from "@radix-ui/react-dropdown-menu"
-import type { Table } from "@tanstack/react-table"
-
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -10,9 +8,10 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu"
 import { Layers } from "lucide-react"
+import type { DataTable } from "./types"
 
 interface DataTableViewOptionsProps<TData> {
-  table: Table<TData>
+  table: DataTable<TData>
 }
 
 export function DataTableViewOptions<TData>({
@@ -36,8 +35,7 @@ export function DataTableViewOptions<TData>({
         {table
           .getAllColumns()
           .filter(
-            (column) =>
-              typeof column.accessorFn !== "undefined" && column.getCanHide()
+            (column) => column.getCanHide()
           )
           .map((column) => {
             return (

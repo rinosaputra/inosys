@@ -1,5 +1,5 @@
 import type { LucideIcon } from "lucide-react"
-import type { DataSearch } from "../schema"
+import type { DataSearch, DataTableOperator } from "../schema"
 
 export interface DataTableSearch {
   getQuery(): DataSearch
@@ -21,7 +21,7 @@ export interface DataTableRow<TData> {
   }[]
 }
 
-export interface DataTableFaceted {
+export interface DataTableFilter {
   label: string
   options: {
     label: string
@@ -30,27 +30,47 @@ export interface DataTableFaceted {
   }[]
 }
 
+export type DataTableFnFacet = () => Promise<Record<string, number>>
+
 export interface DataTableColumnDef<TData> {
   id: string
+  label: string
   header?: (props: { column: DataTableColumn<TData> }) => React.ReactNode
   cell: (props: { row: DataTableRow<TData> }) => React.ReactNode
   children?: DataTableColumnDef<TData>[]
-  disableSorting?: boolean
-  disableVisibility?: boolean
-  faceted?: DataTableFaceted
+  sortable?: {
+    defaultSort?: "asc" | "desc"
+  }
+  visibility?: {
+    defaultVisible?: boolean
+  }
+  searchable?: {
+    placeholder?: string
+  }
+  filter?: DataTableFilter
+  fnFacet?: DataTableFnFacet
 }
 
 export interface DataTableColumn<TData> {
+  id: string
   columnDef: {
     header: DataTableColumnDef<TData>
   },
   getCanSort(): boolean
   getIsSorted(): "asc" | "desc" | false
   toggleSorting(desc?: boolean): void
+  getCanHide(): boolean
+  getIsVisible(): boolean
   toggleVisibility(visible?: boolean): void
+  getCanFilter(): boolean
+  getFilterValue(): string | string[] | undefined
+  setFilterValue(value: string | string[] | undefined, operator?: DataTableOperator): void
+  getFacetedValues(): string[]
+  setFacetedValue(value: string): void
 }
 
 export type DataTable<TData> = {
+  name: string
   getHeaderGroups: () => {
     id: string
     headers: {
@@ -63,4 +83,17 @@ export type DataTable<TData> = {
   getRowModel: () => {
     rows: DataTableRow<TData>[]
   }
+  getColumn(columnId: string): DataTableColumn<TData> | undefined
+  resetColumnFilters(): void
+  getFilterableColumns(): {
+    column: DataTableColumn<TData>
+    filter: DataTableFilter
+    fnFacet: DataTableFnFacet
+  }[]
+  getColumnFilters(): string[]
+  getSearchableColumn(name?: string): {
+    column: DataTableColumn<TData>
+    placeholder: string
+  } | undefined
+  getAllColumns(): DataTableColumn<TData>[]
 }

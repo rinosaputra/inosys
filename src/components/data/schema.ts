@@ -7,6 +7,10 @@ const nonEmptyString = z
   .trim()
   .transform((v) => v)
 
+const dataTableOperators = z.enum(["eq", "ne", "gt", "lt", "gte", "lte", "in", "nin"])
+
+export type DataTableOperator = z.infer<typeof dataTableOperators>
+
 /**
  * General-purpose Data search schema.
  * - URL-friendly
@@ -35,7 +39,7 @@ export const dataSearchSchema = z.object({
   // - value can be string or array for multi-value filters (e.g. multi-select)
   filters: z.record(nonEmptyString, z.object({
     value: z.union([nonEmptyString, z.array(nonEmptyString)]),
-    operator: z.enum(["eq", "ne", "gt", "lt", "gte", "lte", "in", "nin"]).default("eq"),
+    operator: dataTableOperators.default("eq"),
   })).catch({}),
 
   // views (optional, for saving column visibility or other UI state)
@@ -98,3 +102,7 @@ export function toURLSearchParams(search: DataSearch) {
 
   return Object.fromEntries(params)
 }
+
+export const dataFacetSchema = z.record(nonEmptyString, z.number().int().min(0))
+
+export type DataFacet = z.infer<typeof dataFacetSchema>

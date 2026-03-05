@@ -9,19 +9,52 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "#/components/ui/dropdown-menu"
-import { Ellipsis } from "lucide-react"
+import { Ellipsis, type LucideIcon } from "lucide-react"
+import { Link } from "@tanstack/react-router"
+
+type DataTableAction<TData> = (row: TData) => void | string
+
+interface DataTableCustomActionProps<TData> {
+  label: string
+  onClick: DataTableAction<TData>
+  icon?: LucideIcon
+  variant?: "default" | "destructive"
+  shortcut?: string
+}
+
+const DataTableCustomAction = <TData,>({
+  label,
+  onClick,
+  icon: Icon,
+  variant = "default",
+  shortcut,
+}: DataTableCustomActionProps<TData>) => {
+  if (typeof onClick === "string") {
+    return (<DropdownMenuItem variant={variant} asChild>
+      <Link to={onClick}>
+        {Icon && <Icon />}
+        {label}
+        {shortcut && <DropdownMenuShortcut>{shortcut}</DropdownMenuShortcut>}
+      </Link>
+    </DropdownMenuItem>)
+  }
+  if (typeof onClick === "function") {
+    // @ts-ignore
+    return (<DropdownMenuItem onClick={onClick} variant={variant}>
+      {Icon && <Icon />}
+      {label}
+      {shortcut && <DropdownMenuShortcut>{shortcut}</DropdownMenuShortcut>}
+    </DropdownMenuItem>)
+  }
+  return null
+}
 
 interface DataTableRowActionsProps<TData> {
   row: Row<TData>
-  onEdit?: (row: TData) => void
-  onDelete?: (row: TData) => void
-  onView?: (row: TData) => void
-  customActions?: {
-    label: string
-    onClick: (row: TData) => void
-    icon?: React.ReactNode
-    variant?: "default" | "destructive"
-  }[]
+  onEdit?: DataTableAction<TData>
+  onDelete?: DataTableAction<TData>
+  onView?: DataTableAction<TData>
+  customActions?: DataTableCustomActionProps<TData>[]
 }
 
 export function DataTableRowActions<TData>({
@@ -43,41 +76,18 @@ export function DataTableRowActions<TData>({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-40">
-        {onView && (
-          <DropdownMenuItem onClick={() => onView(row.original)}>
-            View
-          </DropdownMenuItem>
-        )}
-        {onEdit && (
-          <DropdownMenuItem onClick={() => onEdit(row.original)}>
-            Edit
-          </DropdownMenuItem>
-        )}
+        {onView && <DataTableCustomAction label="View" onClick={() => onView(row.original)} />}
+        {onEdit && <DataTableCustomAction label="Edit" onClick={() => onEdit(row.original)} />}
         {customActions.length > 0 && <DropdownMenuSeparator />}
         {customActions.map((action, index) => (
-          <DropdownMenuItem
+          <DataTableCustomAction
             key={index}
-            onClick={() => action.onClick(row.original)}
-            className={
-              action.variant === "destructive"
-                ? "text-destructive focus:text-destructive"
-                : ""
-            }
-          >
-            {action.icon && <span className="mr-2">{action.icon}</span>}
-            {action.label}
-          </DropdownMenuItem>
+            {...action} />
         ))}
         {onDelete && (
           <>
             <DropdownMenuSeparator />
-            <DropdownMenuItem
-              onClick={() => onDelete(row.original)}
-              className="text-destructive focus:text-destructive"
-            >
-              Delete
-              <DropdownMenuShortcut>⌘⌫</DropdownMenuShortcut>
-            </DropdownMenuItem>
+            <DataTableCustomAction label="Delete" onClick={() => onDelete(row.original)} variant="destructive" />
           </>
         )}
       </DropdownMenuContent>
