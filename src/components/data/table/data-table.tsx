@@ -95,6 +95,16 @@ function getDataTable<TData>({
           }
         })
       },
+      searchValue: !column.searchable ? "" : navigate.query.search[column.id] || "",
+      setSearchValue: (value) => {
+        if (!(column.searchable)) return
+        const newSearch = { ...navigate.query.search }
+        newSearch[column.id] = value
+        if (!value) {
+          delete newSearch[column.id]
+        }
+        navigate.setQuery({ search: newSearch }, { resetPageIndex: true })
+      },
       canFilter: !!column.filter,
       filterValue: !column.filter ? undefined : navigate.query.filters[column.id]?.value,
       setFilterValue: (value, operator = "eq") => {

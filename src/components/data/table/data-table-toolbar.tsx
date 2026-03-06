@@ -13,21 +13,21 @@ interface DataTableToolbarProps<TData> {
 
 const DataTableSearchableColumn = <TData,>(table: DataTable<TData>) => {
   const searchableColumn = table.getSearchableColumn()
-  const defaultValue = searchableColumn?.column.filterValue as string ?? ""
+  const defaultValue = searchableColumn?.column.searchValue as string ?? ""
   const [value, setValue] = useState(() => defaultValue)
-  const setFilterValue = searchableColumn?.column.setFilterValue
+  const setSearchValue = searchableColumn?.column.setSearchValue
 
   useDebounceCallback({
     value,
     delay: 500,
     callback: (value) => {
-      if (setFilterValue) {
-        setFilterValue(value || undefined)
+      if (setSearchValue) {
+        setSearchValue(value)
       }
     }
   })
 
-  if (!(searchableColumn && setFilterValue)) return null
+  if (!(searchableColumn && setSearchValue)) return null
   return (<Input
     placeholder={searchableColumn.placeholder}
     value={value}
