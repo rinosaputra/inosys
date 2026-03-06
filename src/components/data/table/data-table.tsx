@@ -95,10 +95,17 @@ function getDataTable<TData>({
           }
         })
       },
+      canSearch: !!column.searchable,
       searchValue: !column.searchable ? "" : navigate.query.search[column.id] || "",
       setSearchValue: (value) => {
         if (!(column.searchable)) return
         const newSearch = { ...navigate.query.search }
+        console.log("Setting search value for column:", {
+          columnId: column.id,
+          value,
+          current: navigate.query.search[column.id],
+          newSearch
+        })
         newSearch[column.id] = value
         if (!value) {
           delete newSearch[column.id]
@@ -274,6 +281,11 @@ export function DataTable<TData>(props: DataTableProps<TData>) {
         ...query,
         ...search
       }
+      console.log("Navigating with search:", {
+        search,
+        values,
+        options
+      })
       props.navigate({
         // @ts-ignore
         search: toURLSearchParams({
