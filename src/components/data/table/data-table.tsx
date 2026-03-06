@@ -1,3 +1,8 @@
+import _ from "lodash"
+import type { UseNavigateResult } from "@tanstack/react-router"
+import { useQuery } from "@tanstack/react-query"
+import { toast } from "sonner"
+
 import {
   Table,
   TableBody,
@@ -5,19 +10,15 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
+} from "#/components/ui/table"
+import { Skeleton } from "#/components/ui/skeleton"
 
+import type { DataTable, DataTableColumnDef, DataTableRow, DataTableSearch } from "./types"
 import { DataTablePagination } from "./data-table-pagination"
 import { DataTableToolbar } from "./data-table-toolbar"
-import type { DataTable, DataTableColumnDef, DataTableRow, DataTableSearch } from "./types"
-import _ from "lodash"
-import type { UseNavigateResult } from "@tanstack/react-router"
-import { toDataSearchSchema, toURLSearchParams, type DataSearch } from "../schema"
 import { DataTableColumnHeader } from "./data-table-column-header"
-import { useQuery } from "@tanstack/react-query"
-import { toast } from "sonner"
 import { DataTableRowActions, type DataTableRowActionsProps } from "./data-table-row-actions"
-import { Skeleton } from "#/components/ui/skeleton"
+import { toDataSearchSchema, toURLSearchParams, type DataSearch } from "../schema"
 
 export const getDataTableQueryKey = <T,>(name: T, ...props: unknown[]) => {
   return ["data-table", name, ...props] as const
