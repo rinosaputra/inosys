@@ -21,6 +21,11 @@ const DataTableSearchableColumn = <TData,>(table: DataTable<TData>) => {
     value,
     delay: 500,
     callback: (value) => {
+      console.log("Setting search value:", {
+        value,
+        columnId: searchableColumn?.column.id,
+        callback: typeof setSearchValue
+      })
       if (setSearchValue) {
         setSearchValue(value)
       }
