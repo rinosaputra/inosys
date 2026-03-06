@@ -1,4 +1,4 @@
-import z, { array } from "zod"
+import z from "zod"
 import _ from 'lodash'
 
 const nonEmptyString = z
