@@ -79,6 +79,7 @@ export function DataTableRowActions<TData>({
       <DropdownMenuTrigger asChild>
         <Button
           variant="ghost"
+          size="icon-xs"
           className="data-[state=open]:bg-muted"
           disabled={disabled}
         >

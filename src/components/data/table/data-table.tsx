@@ -1,3 +1,8 @@
+import _ from "lodash"
+import type { UseNavigateResult } from "@tanstack/react-router"
+import { useQuery } from "@tanstack/react-query"
+import { toast } from "sonner"
+
 import {
   Table,
   TableBody,
@@ -5,18 +10,15 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
+} from "#/components/ui/table"
+import { Skeleton } from "#/components/ui/skeleton"
 
+import type { DataTable, DataTableColumnDef, DataTableRow, DataTableSearch } from "./types"
 import { DataTablePagination } from "./data-table-pagination"
 import { DataTableToolbar } from "./data-table-toolbar"
-import type { DataTable, DataTableColumnDef, DataTableRow, DataTableSearch } from "./types"
-import _ from "lodash"
-import type { UseNavigateResult } from "@tanstack/react-router"
-import { toDataSearchSchema, toURLSearchParams, type DataSearch } from "../schema"
 import { DataTableColumnHeader } from "./data-table-column-header"
-import { useQuery } from "@tanstack/react-query"
-import { toast } from "sonner"
 import { DataTableRowActions, type DataTableRowActionsProps } from "./data-table-row-actions"
+import { toDataSearchSchema, toURLSearchParams, type DataSearch } from "../schema"
 
 export const getDataTableQueryKey = <T,>(name: T, ...props: unknown[]) => {
   return ["data-table", name, ...props] as const
@@ -363,43 +365,58 @@ export function DataTable<TData>(props: DataTableProps<TData>) {
             ))}
           </TableHeader>
           <TableBody>
-            {table.rowModel.rows?.length ? (
-              table.rowModel.rows.map((row, index) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.isSelected && "selected"}
-                >
+            {table.isLoading
+              ? Array.from({ length: table.query.pagination.limit }) // Loading skeleton rows based on page size
+                .map((_, i) => (<TableRow key={i}>
                   {props.showRowNumber && (
-                    <TableCell className="w-12 text-center">
-                      {index + 1 + table.query.pagination.index * table.query.pagination.limit}
+                    <TableCell>
+                      <Skeleton className="h-4 w-6 mx-auto" />
                     </TableCell>
                   )}
-                  {row.visibleCells.map((cell) => (
-                    <TableCell key={cell.id}>
-                      {cell.column.columnDef.cell({ row })}
+                  {props.columns.map((column) => (
+                    <TableCell key={column.id}>
+                      <Skeleton className="h-4 w-full" />
                     </TableCell>
                   ))}
-                  {props.rowActions && (
-                    <TableCell className="w-10">
-                      <DataTableRowActions
-                        {...props.rowActions(row)}
-                        row={row}
-                        disabled={table.isLoading}
-                      />
-                    </TableCell>
-                  )}
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={props.columns.length + (props.showRowNumber ? 1 : 0) + (props.rowActions ? 1 : 0)}
-                  className="h-24 text-center"
-                >
-                  No results.
-                </TableCell>
-              </TableRow>
-            )}
+                  {props.rowActions && <TableCell>
+                    <Skeleton className="size-6 mx-auto" />
+                  </TableCell>}
+                </TableRow>))
+              : table.rowModel.rows?.length
+                ? table.rowModel.rows.map((row, index) => ( // Display rows
+                  <TableRow
+                    key={row.id}
+                    data-state={row.isSelected && "selected"}
+                  >
+                    {props.showRowNumber && (
+                      <TableCell className="w-12 text-center">
+                        {index + 1 + table.query.pagination.index * table.query.pagination.limit}
+                      </TableCell>
+                    )}
+                    {row.visibleCells.map((cell) => (
+                      <TableCell key={cell.id}>
+                        {cell.column.columnDef.cell({ row })}
+                      </TableCell>
+                    ))}
+                    {props.rowActions && (
+                      <TableCell>
+                        <DataTableRowActions
+                          {...props.rowActions(row)}
+                          row={row}
+                          disabled={table.isLoading}
+                        />
+                      </TableCell>
+                    )}
+                  </TableRow>
+                ))
+                : (<TableRow> {/* No results row */}
+                  <TableCell
+                    colSpan={props.columns.length + (props.showRowNumber ? 1 : 0) + (props.rowActions ? 1 : 0)}
+                    className="h-24 text-center"
+                  >
+                    No results.
+                  </TableCell>
+                </TableRow>)}
           </TableBody>
         </Table>
       </div>
