@@ -15,13 +15,14 @@ export const Route = createFileRoute('/(protected)/admin/rbac/')({
 
 const parseQuery = (query: DataSearch): AdminRBACQuery => {
   const [sortBy = undefined, sortOrder = undefined] = Object.entries(query.sorts)[0] || []
+  const search = query.search.name || undefined
   const roles = query.filters.role?.value || []
   const statuses = query.filters.status?.value || []
   console.log({ query })
   const result: AdminRBACQuery = {
-    searchValue: query.search.name,
-    searchField: "name",
-    searchOperator: "contains",
+    searchValue: search,
+    searchField: search ? "name" : undefined,
+    searchOperator: search ? "contains" : undefined,
     limit: query.pagination.limit,
     offset: query.pagination.index * query.pagination.limit,
     sortBy: sortBy as AdminRBACSelect,
