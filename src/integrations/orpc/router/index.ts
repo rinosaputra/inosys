@@ -1,3 +1,4 @@
+import orpcExampleDataTable from '#/routes/examples/data-table/-components/orpc'
 import { ORPCError, os } from '@orpc/server'
 import * as z from 'zod'
 
@@ -13,4 +14,9 @@ export default {
       }
       return { response: `Pong: ${input.message}` }
     }),
+
+  // Example of a handler that throws an error
+  examples: {
+    dataTable: orpcExampleDataTable
+  }
 }
