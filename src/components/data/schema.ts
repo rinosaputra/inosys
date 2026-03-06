@@ -87,10 +87,9 @@ export function toURLSearchParams(search: DataSearch) {
   params.push(['pagination.limit', String(search.pagination.limit)])
 
   // search
-  if (search.search && search.search.key && search.search.value) {
-    params.push(['search.key', search.search.key])
-    params.push(['search.value', search.search.value])
-  }
+  Object.entries(search.search).forEach(([key, value]) => {
+    params.push([`search.${key}`, String(value)])
+  })
 
   // views
   Object.entries(search.views).forEach(([key, value]) => {
