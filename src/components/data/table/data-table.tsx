@@ -95,6 +95,7 @@ function getDataTable<TData>({
           }
         })
       },
+      canSearch: !!column.searchable,
       searchValue: !column.searchable ? "" : navigate.query.search[column.id] || "",
       setSearchValue: (value) => {
         if (!(column.searchable)) return

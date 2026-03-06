@@ -60,6 +60,7 @@ export interface DataTableColumn<TData> {
   canVisible: boolean
   isVisible: boolean
   toggleVisible(visible?: boolean): void
+  canSearch: boolean
   searchValue: string
   setSearchValue(value: string): void
   canFilter: boolean
