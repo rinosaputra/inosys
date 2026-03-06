@@ -5,6 +5,7 @@ import { DataTableFacetedFilter } from "./data-table-faceted-filter"
 import { RefreshCw } from "lucide-react"
 import type { DataTable } from "./types"
 import { useState } from "react"
+import { useDebounceCallback } from "#/hooks/use-debounce"
 
 interface DataTableToolbarProps<TData> {
   table: DataTable<TData>
@@ -12,21 +13,21 @@ interface DataTableToolbarProps<TData> {
 
 const DataTableSearchableColumn = <TData,>(table: DataTable<TData>) => {
   const searchableColumn = table.getSearchableColumn()
-  const defaultValue = searchableColumn?.column.filterValue ?? ""
+  const defaultValue = searchableColumn?.column.filterValue as string ?? ""
   const [value, setValue] = useState(() => defaultValue)
-  // const setFilterValue = searchableColumn?.column.setFilterValue
-  // useEffect(() => {
-  //   const handler = setTimeout(() => {
-  //     console.log("value")
-  //     if (setFilterValue) setFilterValue(value);
-  //   }, 500);
+  const setFilterValue = searchableColumn?.column.setFilterValue
 
-  //   return () => {
-  //     clearTimeout(handler);
-  //   };
-  // }, [value, setFilterValue]);
+  useDebounceCallback({
+    value,
+    delay: 500,
+    callback: (value) => {
+      if (setFilterValue) {
+        setFilterValue(value || undefined)
+      }
+    }
+  })
 
-  if (!searchableColumn) return null
+  if (!(searchableColumn && setFilterValue)) return null
   return (<Input
     placeholder={searchableColumn.placeholder}
     value={value}
