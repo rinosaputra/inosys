@@ -82,7 +82,8 @@
     "format": "prettier --check .",
     "lint": "eslint",
     "preview": "vite preview",
-    "test": "vitest run"
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
   },
   "type": "module"
 }
