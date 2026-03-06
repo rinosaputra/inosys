@@ -1,11 +1,14 @@
+import { useState } from "react"
+import { RefreshCw, Search } from "lucide-react"
+
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import { InputGroup, InputGroupAddon, InputGroupInput } from "#/components/ui/input-group"
+import { Spinner } from "#/components/ui/spinner"
+import { useDebounceCallback } from "#/hooks/use-debounce"
+
+import type { DataTable } from "./types"
 import { DataTableViewOptions } from "./data-table-view-options"
 import { DataTableFacetedFilter } from "./data-table-faceted-filter"
-import { RefreshCw } from "lucide-react"
-import type { DataTable } from "./types"
-import { useState } from "react"
-import { useDebounceCallback } from "#/hooks/use-debounce"
 
 interface DataTableToolbarProps<TData> {
   table: DataTable<TData>
@@ -13,30 +16,35 @@ interface DataTableToolbarProps<TData> {
 
 const DataTableSearchableColumn = <TData,>(table: DataTable<TData>) => {
   const searchableColumn = table.getSearchableColumn()
-  const defaultValue = searchableColumn?.column.filterValue as string ?? ""
+  const defaultValue = searchableColumn?.column.searchValue as string ?? ""
   const [value, setValue] = useState(() => defaultValue)
-  const setFilterValue = searchableColumn?.column.setFilterValue
+  const setSearchValue = searchableColumn?.column.setSearchValue
+  const isDenoted = value !== defaultValue
 
   useDebounceCallback({
     value,
     delay: 500,
     callback: (value) => {
-      if (setFilterValue) {
-        setFilterValue(value || undefined)
-      }
+      if (setSearchValue) setSearchValue(value)
+      return
     }
   })
 
-  if (!(searchableColumn && setFilterValue)) return null
-  return (<Input
-    placeholder={searchableColumn.placeholder}
-    value={value}
-    onChange={(event) =>
-      setValue(event.target.value)
-    }
-    className="h-8 w-37.5 lg:w-62.5"
-    disabled={table.isLoading}
-  />)
+  if (!searchableColumn) return null
+  return (<InputGroup className="h-8 w-37.5 lg:w-62.5">
+    <InputGroupInput
+      placeholder={searchableColumn.placeholder}
+      value={value}
+      onChange={(event) =>
+        setValue(event.target.value)
+      }
+      className="h-8 w-37.5 lg:w-62.5"
+      disabled={table.isLoading} />
+    <InputGroupAddon>
+      <Search />
+    </InputGroupAddon>
+    {isDenoted && <InputGroupAddon align="inline-end"><Spinner /></InputGroupAddon>}
+  </InputGroup>)
 }
 
 const IsFilterActive = <TData,>(table: DataTable<TData>) => {
