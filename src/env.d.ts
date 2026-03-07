@@ -8,6 +8,9 @@ interface ImportMetaEnv {
   // Auth URLs
   readonly VITE_AUTH_LOGIN_URL: string
   readonly VITE_IS_AUTH_URL: string
+
+  // Unauthorized access URL
+  readonly VITE_UNAUTHORIZED_URL: string
 }
 
 interface ImportMeta {
