@@ -1,7 +1,10 @@
 import { dataSearchSchema, dataTableDirections, nonEmptyString } from "#/components/data/schema";
+import { roles, type Role } from "#/integrations/better-auth/rbac/permission";
 import z from "zod";
 
-export const AdminRBACRoleSchema = z.enum(['superadmin', 'admin', 'member'])
+export const AdminRBACRoleEnum = Object.keys(roles) as [Role, ...Role[]]
+
+export const AdminRBACRoleSchema = z.enum(AdminRBACRoleEnum)
 
 export const AdminRBACSchema = z.object({
   id: z.string(),
@@ -34,3 +37,11 @@ export const AdminRBACQuerySchema = dataSearchSchema
   })
 
 export type AdminRBACQuery = z.infer<typeof AdminRBACQuerySchema>
+
+export const AdminRBACCreateSchema = AdminRBACSchema.pick({
+  name: true,
+  email: true,
+  role: true,
+}).extend({
+  // password: password
+})

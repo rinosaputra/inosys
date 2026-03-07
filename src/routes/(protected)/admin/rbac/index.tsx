@@ -1,22 +1,23 @@
 import { createFileRoute } from '@tanstack/react-router'
 import z from 'zod'
 
+import { createMeta, type CreateMetaInput } from '#/lib/seo'
+
 import { DataTable } from '#/components/data/table/data-table'
 import type { DataSearch } from '#/components/data/schema'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '#/components/ui/card'
+import { Separator } from '#/components/ui/separator'
+import { Button } from '#/components/ui/button'
 
 import { orpc } from '#/integrations/orpc/client'
 
 import { adminRBACColumns } from '#/features/admin/rbac/admin-rbac-columns'
 import type { AdminRBACQuery } from '#/features/admin/rbac/admin-rbac-schema'
 import { AdminRBACQuerySchema, AdminRBACRoleSchema } from '#/features/admin/rbac/admin-rbac-schema'
-import { createMeta, type CreateMetaInput } from '#/lib/seo'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '#/components/ui/card'
-import { Separator } from '#/components/ui/separator'
-import { Button } from '#/components/ui/button'
 
 const metadata: CreateMetaInput = {
-  title: "Admin RBAC",
-  description: "Demo penggunaan data table dengan fitur pencarian, filter, dan pagination di halaman admin RBAC.",
+  title: "User Management - RBAC",
+  description: "Halaman untuk mengelola pengguna di admin RBAC.",
   url: "/admin/rbac",
 }
 
@@ -29,7 +30,6 @@ export const Route = createFileRoute('/(protected)/admin/rbac/')({
 const parseQuery = (query: DataSearch): AdminRBACQuery => {
   const roles = query.filters.role?.value || []
   const statuses = query.filters.status?.value || []
-  console.log({ query })
   const result: AdminRBACQuery = {
     ...query,
     search: query.search.name,
