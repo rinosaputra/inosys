@@ -1,3 +1,4 @@
+import { dataSearchSchema, dataTableDirections, dataTableOperators, nonEmptyString } from "#/components/data/schema";
 import z from "zod";
 
 export const AdminRBACSchema = z.object({
@@ -16,17 +17,19 @@ export const AdminRBACSelectSchema = z.enum(AdminRBACSelectEnum)
 
 export type AdminRBACSelect = z.infer<typeof AdminRBACSelectSchema>
 
-export const AdminRBACQuerySchema = z.object({
-  searchValue: z.string().optional(),
-  searchField: z.enum(AdminRBACSelectEnum).optional(),
-  searchOperator: z.enum(['contains', 'eq', 'startsWith', 'endsWith']).optional(),
-  limit: z.number().int().positive().max(100).default(20),
-  offset: z.number().int().min(0).default(0),
-  sortBy: z.enum(AdminRBACSelectEnum).optional(),
-  sortDirection: z.enum(['asc', 'desc']).optional(),
-  filterField: z.enum(AdminRBACSelectEnum).optional(),
-  filterValue: z.string().optional(),
-  filterOperator: z.enum(['eq', 'ne', 'gt', 'lt', 'in']).optional()
-})
+export const AdminRBACQuerySchema = dataSearchSchema
+  .pick({
+    pagination: true,
+  }).extend({
+    search: z.partialRecord(AdminRBACSelectSchema, nonEmptyString).catch({}),
+    sorts: z.partialRecord(AdminRBACSelectSchema, dataTableDirections).catch({}),
+    filters: z.partialRecord(
+      AdminRBACSelectSchema,
+      z.object({
+        value: z.array(nonEmptyString).or(nonEmptyString),
+        operator: dataTableOperators.default("eq"),
+      })
+    ).catch({}),
+  })
 
 export type AdminRBACQuery = z.infer<typeof AdminRBACQuerySchema>
