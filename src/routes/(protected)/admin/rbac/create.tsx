@@ -1,9 +1,11 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { useForm } from "@tanstack/react-form"
 
 import { createMeta, type CreateMetaInput } from '#/lib/seo'
 
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '#/components/ui/card'
 import { Separator } from '#/components/ui/separator'
+import { AdminRBACCreateSchema, type AdminRBACCreate } from '#/features/admin/rbac/admin-rbac-schema'
 
 const metadata: CreateMetaInput = {
   title: "Buat Pengguna Baru - RBAC",
@@ -16,7 +18,24 @@ export const Route = createFileRoute('/(protected)/admin/rbac/create')({
   head: () => createMeta(metadata),
 })
 
+const defaultValues: AdminRBACCreate = {
+  name: '',
+  email: '',
+  password: '',
+  role: 'member',
+}
+
 function RouteComponent() {
+  const form = useForm({
+    validators: {
+      onSubmit: AdminRBACCreateSchema
+    },
+    defaultValues,
+    onSubmit: ({ value }) => {
+      // Handle form submission, e.g., send data to the server
+      console.log('Form submitted with values:', value)
+    }
+  })
 
   return (<Card>
     <CardHeader>
@@ -27,6 +46,9 @@ function RouteComponent() {
     </CardHeader>
     <Separator />
     <CardContent>
+      <form>
+        {/* Form fields for creating a new user would go here */}
+      </form>
     </CardContent>
     <Separator />
     <CardFooter></CardFooter>
