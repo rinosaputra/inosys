@@ -1,4 +1,5 @@
 import { dataSearchSchema, dataTableDirections, nonEmptyString } from "#/components/data/schema";
+import { passwordSchema } from "#/components/password/schema";
 import { roles, type Role } from "#/integrations/better-auth/rbac/permission";
 import z from "zod";
 
@@ -43,5 +44,7 @@ export const AdminRBACCreateSchema = AdminRBACSchema.pick({
   email: true,
   role: true,
 }).extend({
-  // password: password
+  password: passwordSchema
 })
+
+export type AdminRBACCreate = z.infer<typeof AdminRBACCreateSchema>

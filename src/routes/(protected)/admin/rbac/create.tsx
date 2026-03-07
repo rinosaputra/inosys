@@ -17,6 +17,7 @@ export const Route = createFileRoute('/(protected)/admin/rbac/create')({
 })
 
 function RouteComponent() {
+
   return (<Card>
     <CardHeader>
       <CardTitle>{metadata.title}</CardTitle>
