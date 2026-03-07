@@ -1,15 +1,19 @@
 import z from "zod"
 import _ from 'lodash'
 
-const nonEmptyString = z
+export const nonEmptyString = z
   .coerce
   .string()
   .trim()
   .transform((v) => v)
 
-const dataTableOperators = z.enum(["eq", "ne", "gt", "lt", "gte", "lte", "in", "nin"])
+export const dataTableOperators = z.enum(["eq", "ne", "gt", "lt", "gte", "lte", "in", "nin"])
 
 export type DataTableOperator = z.infer<typeof dataTableOperators>
+
+export const dataTableDirections = z.enum(["asc", "desc"])
+
+export type DataTableDirection = z.infer<typeof dataTableDirections>
 
 /**
  * General-purpose Data search schema.
@@ -33,7 +37,7 @@ export const dataSearchSchema = z.object({
   search: z.record(nonEmptyString, nonEmptyString).catch({}),
 
   // sorting (optional & clean)
-  sorts: z.record(nonEmptyString, z.enum(["asc", "desc"])).catch({}),
+  sorts: z.record(nonEmptyString, dataTableDirections).catch({}),
 
   // filters (optional & flexible)
   // - value can be string or array for multi-value filters (e.g. multi-select)
