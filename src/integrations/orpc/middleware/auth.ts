@@ -19,3 +19,5 @@ export const authMiddleware = base.middleware(async ({ next }) => {
     context: sessionData
   })
 })
+
+export const authorized = base.use(authMiddleware)
