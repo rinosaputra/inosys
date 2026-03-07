@@ -1,3 +1,4 @@
+import { adminRBACRoute } from '#/features/admin/rbac/admin-rbac-route'
 import { ORPCError, os } from '@orpc/server'
 import * as z from 'zod'
 
@@ -13,4 +14,9 @@ export default {
       }
       return { response: `Pong: ${input.message}` }
     }),
+
+  // Admin
+  admin: {
+    rbac: adminRBACRoute
+  }
 }

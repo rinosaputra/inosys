@@ -1,12 +1,14 @@
 import { createFileRoute } from '@tanstack/react-router'
+import z from 'zod'
 
 import { DataTable } from '#/components/data/table/data-table'
 import type { DataSearch } from '#/components/data/schema'
 
-import z from 'zod'
+import { orpc } from '#/integrations/orpc/client'
+
 import { adminRBACColumns } from '#/features/admin/rbac/admin-rbac-columns'
-import type { AdminRBACQuery, AdminRBACSelect } from '#/features/admin/rbac/admin-rbac-schema'
-import { AdminRBACQuerySchema } from '#/features/admin/rbac/admin-rbac-schema'
+import type { AdminRBACQuery } from '#/features/admin/rbac/admin-rbac-schema'
+import { AdminRBACQuerySchema, AdminRBACRoleSchema } from '#/features/admin/rbac/admin-rbac-schema'
 
 export const Route = createFileRoute('/(protected)/admin/rbac/')({
   component: RouteComponent,
@@ -14,22 +16,16 @@ export const Route = createFileRoute('/(protected)/admin/rbac/')({
 })
 
 const parseQuery = (query: DataSearch): AdminRBACQuery => {
-  const [sortBy = undefined, sortOrder = undefined] = Object.entries(query.sorts)[0] || []
-  const search = query.search.name || undefined
   const roles = query.filters.role?.value || []
   const statuses = query.filters.status?.value || []
   console.log({ query })
   const result: AdminRBACQuery = {
-    searchValue: search,
-    searchField: search ? "name" : undefined,
-    searchOperator: search ? "contains" : undefined,
-    limit: query.pagination.limit,
-    offset: query.pagination.index * query.pagination.limit,
-    sortBy: sortBy as AdminRBACSelect,
-    sortDirection: sortOrder,
-    filterField: roles.length > 0 ? "role" : statuses.length > 0 ? "status" : undefined,
-    filterValue: roles.length > 0 ? roles.join(",") : statuses.length > 0 ? statuses.join(",") : undefined,
-    filterOperator: roles.length > 0 || statuses.length > 0 ? "in" : undefined
+    ...query,
+    search: query.search.name,
+    filters: {
+      roles: AdminRBACRoleSchema.array().parse(Array.isArray(roles) ? roles : [roles]) || undefined,
+      isActive: statuses.length === 1 ? statuses[0] === 'active' : undefined,
+    }
   }
   return AdminRBACQuerySchema.parse(result)
 }
@@ -45,25 +41,14 @@ function RouteComponent() {
         columns: adminRBACColumns,
         navigate,
         search,
-        getData: async (query) => {
-          return orpc.examples.dataTable.findMany.call(parseQuery(query))
+        getData: (query) => {
+          return orpc.admin.rbac.findMany.call(parseQuery(query))
         },
-        getCount: async (query) => {
-          const { search, role, status } = parseQuery(query)
-          console.log({
-            search,
-            role,
-            status
-          })
-          const total = await orpc.examples.dataTable.count.call({
-            search,
-            role,
-            status
-          })
-          return total
+        getCount: (query) => {
+          return orpc.admin.rbac.count.call(parseQuery(query))
         },
         getFacets: async () => {
-          const facets = await orpc.examples.dataTable.facets.call()
+          const facets = await orpc.admin.rbac.facets.call()
           return facets
         },
         showRowNumber: true,
