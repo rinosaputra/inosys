@@ -101,6 +101,9 @@ function BasicFormExample() {
             <form.SubmitForm
               label="Submit"
             />
+            <form.ResetForm
+              label="Reset"
+            />
           </form.AppForm>
           <Button
             type="button"
