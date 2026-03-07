@@ -16,6 +16,7 @@ export function ResetForm({
   icon,
   isLoading,
   onClick,
+  variant = "outline",
   ...props
 }: ResetFormProps) {
   const form = useFormContext()
@@ -28,6 +29,7 @@ export function ResetForm({
           <Button {...{
             ...props,
             type: "button",
+            variant,
             disabled: isSubmitting || isLoading,
             onClick: (e) => {
               form.reset()
