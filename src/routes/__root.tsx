@@ -5,6 +5,7 @@ import { TanStackDevtools } from '@tanstack/react-devtools'
 import TanStackQueryProvider from '../integrations/tanstack-query/root-provider'
 
 import TanStackQueryDevtools from '../integrations/tanstack-query/devtools'
+import TanStackFormDevtools from '#/integrations/tanstack-form/devtools'
 
 import appCss from '../styles.css?url'
 import { SITE_TITLE } from '#/lib/site'
@@ -56,6 +57,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                 render: <TanStackRouterDevtoolsPanel />,
               },
               TanStackQueryDevtools,
+              TanStackFormDevtools,
             ]}
           />
         </TanStackQueryProvider>
