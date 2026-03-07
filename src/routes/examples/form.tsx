@@ -4,6 +4,7 @@ import { z } from 'zod'
 
 import { useAppForm } from '#/integrations/tanstack-form/form-hook'
 import { FieldGroup } from '#/components/ui/field'
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '#/components/ui/card'
 
 export const Route = createFileRoute('/examples/form')({
   component: ExamplesFormsPage,
@@ -46,7 +47,7 @@ const FormDefaultValues: FormValues = {
   name: '',
   email: '',
   bio: '',
-  gender: '',
+  gender: 'male',
 }
 
 function FormExample() {
@@ -62,78 +63,83 @@ function FormExample() {
   })
 
   return (
-    <section className="island-shell rounded-2xl p-6">
-      <h2 className="m-0 text-lg font-semibold">Basic form</h2>
-      <p className="mt-1 text-sm text-muted-foreground">
-        Contoh minimal untuk TextField.
-      </p>
+    <Card>
+      <CardHeader>
+        <CardTitle>Example 1: Basic Form</CardTitle>
+        <CardDescription>
+          Contoh form sederhana dengan beberapa field (name, email, bio, gender) dan tombol submit/reset. Validasi menggunakan Zod schema.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <form
+          className="mt-5 flex flex-col gap-6"
+          onSubmit={(e) => {
+            e.preventDefault()
+            void form.handleSubmit()
+          }}
+        >
+          <FieldGroup>
+            <form.AppField name="name">
+              {(field) => (
+                <field.TextField
+                  label="Name"
+                  placeholder="Your name"
+                  autoComplete="name"
+                />
+              )}
+            </form.AppField>
 
-      <form
-        className="mt-5 flex flex-col gap-6"
-        onSubmit={(e) => {
-          e.preventDefault()
-          void form.handleSubmit()
-        }}
-      >
-        <FieldGroup>
-          <form.AppField name="name">
-            {(field) => (
-              <field.TextField
-                label="Name"
-                placeholder="Your name"
-                autoComplete="name"
-              />
-            )}
-          </form.AppField>
+            <form.AppField name="email">
+              {(field) => (
+                <field.TextField
+                  label="Email"
+                  placeholder="you@example.com"
+                  autoComplete="email"
+                  inputMode="email"
+                />
+              )}
+            </form.AppField>
+            <form.AppField name="bio">
+              {(field) => (
+                <field.TextareaField
+                  label="Bio"
+                  placeholder="Write something..."
+                  rows={5}
+                />
+              )}
+            </form.AppField>
+            <form.AppField name="gender">
+              {(field) => (
+                <field.SelectField
+                  label="Gender"
+                  options={[
+                    { value: 'male', label: 'Male' },
+                    { value: 'female', label: 'Female' },
+                  ]}
+                />
+              )}
+            </form.AppField>
+          </FieldGroup>
 
-          <form.AppField name="email">
-            {(field) => (
-              <field.TextField
-                label="Email"
-                placeholder="you@example.com"
-                autoComplete="email"
-                inputMode="email"
+          <div className="flex items-center gap-3">
+            <form.AppForm>
+              <form.SubmitForm
+                label="Submit"
+                loadingLabel="Submitting..."
               />
-            )}
-          </form.AppField>
-          <form.AppField name="bio">
-            {(field) => (
-              <field.TextareaField
-                label="Bio"
-                placeholder="Write something..."
-                rows={5}
-              />
-            )}
-          </form.AppField>
-          <form.AppField name="gender">
-            {(field) => (
-              <field.SelectField
-                label="Gender"
-                options={[
-                  { value: 'male', label: 'Male' },
-                  { value: 'female', label: 'Female' },
-                ]}
-              />
-            )}
-          </form.AppField>
-        </FieldGroup>
+              <form.ResetForm />
+            </form.AppForm>
+          </div>
 
-        <div className="flex items-center gap-3">
-          <form.AppForm>
-            <form.SubmitForm
-              label="Submit"
-              loadingLabel="Submitting..."
-            />
-            <form.ResetForm />
-          </form.AppForm>
-        </div>
-
+        </form>
+      </CardContent>
+      <CardFooter>
         {submitted ? (
           <pre className="rounded-xl bg-muted p-4 text-xs overflow-auto">
             {JSON.stringify(submitted, null, 2)}
           </pre>
         ) : null}
-      </form>
-    </section>
+      </CardFooter>
+    </Card>
   )
 }
