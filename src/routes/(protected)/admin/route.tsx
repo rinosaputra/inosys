@@ -10,5 +10,11 @@ export const Route = createFileRoute('/(protected)/admin')({
     }
     return { auth: session };
   },
-  component: () => <Outlet />,
+  component: () => <div className="flex flex-1 flex-col">
+    <div className="@container/main flex flex-1 flex-col gap-2">
+      <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6 mx-auto max-w-full w-4xl">
+        <Outlet />
+      </div>
+    </div>
+  </div>,
 })

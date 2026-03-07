@@ -9,10 +9,21 @@ import { orpc } from '#/integrations/orpc/client'
 import { adminRBACColumns } from '#/features/admin/rbac/admin-rbac-columns'
 import type { AdminRBACQuery } from '#/features/admin/rbac/admin-rbac-schema'
 import { AdminRBACQuerySchema, AdminRBACRoleSchema } from '#/features/admin/rbac/admin-rbac-schema'
+import { createMeta, type CreateMetaInput } from '#/lib/seo'
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '#/components/ui/card'
+import { Separator } from '#/components/ui/separator'
+import { Button } from '#/components/ui/button'
+
+const metadata: CreateMetaInput = {
+  title: "Admin RBAC",
+  description: "Demo penggunaan data table dengan fitur pencarian, filter, dan pagination di halaman admin RBAC.",
+  url: "/admin/rbac",
+}
 
 export const Route = createFileRoute('/(protected)/admin/rbac/')({
   component: RouteComponent,
-  validateSearch: z.record(z.string(), z.coerce.string().trim())
+  validateSearch: z.record(z.string(), z.coerce.string().trim()),
+  head: () => createMeta(metadata),
 })
 
 const parseQuery = (query: DataSearch): AdminRBACQuery => {
@@ -33,9 +44,24 @@ const parseQuery = (query: DataSearch): AdminRBACQuery => {
 function RouteComponent() {
   const search = Route.useSearch()
   const navigate = Route.useNavigate()
-  return (<div className="page-wrap px-4 pb-8 pt-14">
-    <section className="island-shell rounded-2xl p-6 sm:p-8 space-y-4">
-      <h1 className="text-2xl font-bold">Admin / Data Table Demo</h1>
+  return (<Card>
+    <CardHeader>
+      <div className="flex flex-row gap-2">
+        <div className="flex-1">
+          <CardTitle>{metadata.title}</CardTitle>
+          <CardDescription>
+            {metadata.description}
+          </CardDescription>
+        </div>
+        <div>
+          <Button size="sm">
+            Create New
+          </Button>
+        </div>
+      </div>
+    </CardHeader>
+    <Separator />
+    <CardContent>
       <DataTable {...{
         name: "admin-rbac",
         columns: adminRBACColumns,
@@ -67,6 +93,6 @@ function RouteComponent() {
           ]
         }),
       }} />
-    </section>
-  </div>)
+    </CardContent>
+  </Card>)
 }
