@@ -6,12 +6,18 @@ import { Button } from "#/components/ui/button"
 import { Spinner } from "#/components/ui/spinner"
 
 type ResetFormProps = {
-  label: string
+  label?: string
   icon?: LucideIcon
   isLoading?: boolean
 } & Pick<React.ComponentProps<typeof Button>, "variant" | "size" | "onClick">
 
-export function ResetForm({ label, icon, isLoading, onClick, ...props }: ResetFormProps) {
+export function ResetForm({
+  label = "Reset",
+  icon,
+  isLoading,
+  onClick,
+  ...props
+}: ResetFormProps) {
   const form = useFormContext()
   return (
     <form.Subscribe selector={(state) => state.isSubmitting}>
