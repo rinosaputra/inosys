@@ -6,13 +6,19 @@ import { Button } from "#/components/ui/button"
 import { Spinner } from "#/components/ui/spinner"
 
 type SubmitFormProps = {
-  label: string
+  label?: string
   icon?: LucideIcon
   isLoading?: boolean
   loadingLabel?: string
 } & Pick<React.ComponentProps<typeof Button>, "variant" | "size">
 
-export function SubmitForm({ label, icon, isLoading, loadingLabel, ...props }: SubmitFormProps) {
+export function SubmitForm({
+  label = "Submit",
+  icon,
+  isLoading,
+  loadingLabel,
+  ...props
+}: SubmitFormProps) {
   const form = useFormContext()
   return (
     <form.Subscribe selector={(state) => state.isSubmitting}>
