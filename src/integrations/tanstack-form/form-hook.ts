@@ -7,6 +7,7 @@ import { TextareaField } from './fields/TextareaField'
 
 import { SubmitForm } from './forms/SubmitForm'
 import { ResetForm } from './forms/ResetForm'
+import { SelectField } from './fields/SelectField'
 
 export const { useAppForm, withForm } = createFormHook({
   fieldContext,
@@ -14,6 +15,7 @@ export const { useAppForm, withForm } = createFormHook({
   fieldComponents: {
     TextField,
     TextareaField,
+    SelectField,
 
     // Can add more custom field components here
   },
