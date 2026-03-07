@@ -4,7 +4,6 @@ import { z } from 'zod'
 
 import { useAppForm } from '#/integrations/tanstack-form/form-hook'
 import { FieldGroup } from '#/components/ui/field'
-import { Button } from '#/components/ui/button'
 
 export const Route = createFileRoute('/examples/form')({
   component: ExamplesFormsPage,
@@ -22,8 +21,7 @@ function ExamplesFormsPage() {
       </section>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-2">
-        <BasicFormExample />
-        <TextareaExample />
+        <FormExample />
       </div>
     </main>
   )
@@ -35,24 +33,28 @@ function ExamplesFormsPage() {
  * - Menunjukkan handle submit (tanpa server call).
  */
 
-const BasicFormSchema = z.object({
+const FormSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   email: z.email('Invalid email address'),
+  bio: z.string().min(10, 'Bio must be at least 10 characters').max(500, 'Bio must be less than 500 characters'),
+  gender: z.enum(['male', 'female'], 'Please select a gender'),
 })
 
-type BasicFormValues = z.infer<typeof BasicFormSchema>
+type FormValues = z.infer<typeof FormSchema>
 
-const BasicFormDefaultValues: BasicFormValues = {
+const FormDefaultValues: FormValues = {
   name: '',
   email: '',
+  bio: '',
+  gender: '',
 }
 
-function BasicFormExample() {
-  const [submitted, setSubmitted] = useState<BasicFormValues | undefined>(undefined)
+function FormExample() {
+  const [submitted, setSubmitted] = useState<FormValues | undefined>(undefined)
 
   const form = useAppForm({
-    defaultValues: BasicFormDefaultValues,
-    validators: { onSubmit: BasicFormSchema },
+    defaultValues: FormDefaultValues,
+    validators: { onSubmit: FormSchema },
     onSubmit: async ({ value }) => {
       // Simulasi submit
       setSubmitted(value)
@@ -94,79 +96,6 @@ function BasicFormExample() {
               />
             )}
           </form.AppField>
-        </FieldGroup>
-
-        <div className="flex items-center gap-3">
-          <form.AppForm>
-            <form.SubmitForm
-              label="Submit"
-            />
-            <form.ResetForm
-              label="Reset"
-            />
-          </form.AppForm>
-          <Button
-            type="button"
-            variant="secondary"
-            onClick={() => {
-              form.reset()
-            }}
-          >
-            Reset
-          </Button>
-        </div>
-
-        {submitted ? (
-          <pre className="rounded-xl bg-muted p-4 text-xs overflow-auto">
-            {JSON.stringify(submitted, null, 2)}
-          </pre>
-        ) : null}
-      </form>
-    </section>
-  )
-}
-
-/**
- * Example 2: Textarea usage.
- * - Menunjukkan field.TextareaField (pre-bound).
- */
-
-const TextareaFormSchema = z.object({
-  bio: z.string().min(1, 'Bio is required'),
-})
-
-type TextareaFormValues = z.infer<typeof TextareaFormSchema>
-
-const TextareaFormDefaultValues: TextareaFormValues = {
-  bio: '',
-}
-
-function TextareaExample() {
-  const [submitted, setSubmitted] = useState<TextareaFormValues | undefined>(undefined)
-
-  const form = useAppForm({
-    defaultValues: TextareaFormDefaultValues,
-    validators: { onSubmit: TextareaFormSchema },
-    onSubmit: async ({ value }) => {
-      setSubmitted(value)
-    },
-  })
-
-  return (
-    <section className="island-shell rounded-2xl p-6">
-      <h2 className="m-0 text-lg font-semibold">Textarea form</h2>
-      <p className="mt-1 text-sm text-muted-foreground">
-        Contoh penggunaan TextareaField.
-      </p>
-
-      <form
-        className="mt-5 flex flex-col gap-6"
-        onSubmit={(e) => {
-          e.preventDefault()
-          void form.handleSubmit()
-        }}
-      >
-        <FieldGroup>
           <form.AppField name="bio">
             {(field) => (
               <field.TextareaField
@@ -176,24 +105,27 @@ function TextareaExample() {
               />
             )}
           </form.AppField>
+          <form.AppField name="gender">
+            {(field) => (
+              <field.SelectField
+                label="Gender"
+                options={[
+                  { value: 'male', label: 'Male' },
+                  { value: 'female', label: 'Female' },
+                ]}
+              />
+            )}
+          </form.AppField>
         </FieldGroup>
 
         <div className="flex items-center gap-3">
           <form.AppForm>
             <form.SubmitForm
               label="Submit"
+              loadingLabel="Submitting..."
             />
+            <form.ResetForm />
           </form.AppForm>
-          <Button
-            type="button"
-            variant="secondary"
-            onClick={() => {
-              form.reset()
-              setSubmitted(undefined)
-            }}
-          >
-            Reset
-          </Button>
         </div>
 
         {submitted ? (
