@@ -84,14 +84,19 @@ function RouteComponent() {
         rowActions: (row) => ({
           customActions: [
             {
-              label: "This is a link",
+              label: "Edit",
               type: "link",
-              payload: `#`,
+              payload: adminRBACUrls.edit(row.original.id)
             },
             {
-              label: "This is an action",
-              type: "action",
-              payload: () => alert(`Message sent to ${row.original.name}`)
+              label: "Change Password",
+              type: "link",
+              payload: adminRBACUrls.changePassword(row.original.id)
+            },
+            {
+              label: "Change Role",
+              type: "link",
+              payload: adminRBACUrls.changeRole(row.original.id)
             }
           ]
         }),

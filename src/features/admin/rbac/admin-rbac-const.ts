@@ -6,6 +6,8 @@ export const adminRBACUrls = {
   list: '/admin/rbac',
   create: '/admin/rbac/create',
   edit: (id: string) => `/admin/rbac/${id}/edit`,
+  changePassword: (id: string) => `/admin/rbac/${id}/change-password`,
+  changeRole: (id: string) => `/admin/rbac/${id}/change-role`,
 }
 
 export const adminRBACRoleOptions: {

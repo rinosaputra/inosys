@@ -6,13 +6,12 @@ import { withForm } from "#/integrations/tanstack-form/form-hook"
 
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "#/components/ui/card"
 import { Separator } from "#/components/ui/separator"
+import { Button } from "#/components/ui/button"
 
 import { AdminRBACUpdateSchema, type AdminRBACUpdate } from "./admin-rbac-schema"
 import { adminRBACUrls } from "./admin-rbac-const"
-import { Button } from "#/components/ui/button"
 
 const defaultValues: AdminRBACUpdate = {
-  id: '',
   name: '',
 }
 

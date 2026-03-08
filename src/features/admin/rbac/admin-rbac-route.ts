@@ -1,11 +1,11 @@
 import { authorized } from "#/integrations/orpc/middleware/auth";
 import type { Prisma } from "@generated/prisma/client";
 
-import { AdminRBACQuerySchema, AdminRBACSchema, type AdminRBACQuery } from "./admin-rbac-schema";
+import { AdminRBACQuerySchema, AdminRBACSchema, type AdminRBAC, type AdminRBACQuery } from "./admin-rbac-schema";
 import prisma from "#/lib/prisma";
 import type { Role } from "#/integrations/better-auth/rbac/permission";
 
-const createUserWhereInput = (input: Pick<AdminRBACQuery, "filters" | "search">): Prisma.UserWhereInput => {
+const createAdminRBACWhereInput = (input: Pick<AdminRBACQuery, "filters" | "search">): Prisma.UserWhereInput => {
   const where: Prisma.UserWhereInput = {};
   if (input.search) {
     where.OR = [
@@ -22,33 +22,35 @@ const createUserWhereInput = (input: Pick<AdminRBACQuery, "filters" | "search">)
   return where;
 }
 
+const parseAdminRBACData = (user: Prisma.UserGetPayload<{}>): AdminRBAC => ({
+  id: user.id,
+  name: user.name,
+  email: user.email,
+  role: (user.role as Role) || 'member',
+  status: user.banned ? 'inactive' : 'active',
+  createdAt: user.createdAt,
+  updatedAt: user.updatedAt,
+})
+
 export const adminRBACRoute = {
   findMany: authorized
     .input(AdminRBACQuerySchema)
     .output(AdminRBACSchema.array())
     .handler(async ({ input }) => {
       const results = await prisma.user.findMany({
-        where: createUserWhereInput(input),
+        where: createAdminRBACWhereInput(input),
         orderBy: Object.entries(input.sorts || {}).map(([key, direction]) => ({ [key]: direction })),
         skip: input.pagination?.index * input.pagination?.limit,
         take: input.pagination?.limit,
       })
 
-      return results.map(({ id, name, email, role, banned, createdAt, updatedAt }) => ({
-        id,
-        name,
-        email,
-        role: (role as Role) || 'member', // default to 'member' if role is null
-        status: banned ? 'inactive' : 'active',
-        createdAt,
-        updatedAt,
-      }))
+      return results.map(parseAdminRBACData)
     }),
   count: authorized
     .input(AdminRBACQuerySchema.pick({ search: true, filters: true }))
     .handler(async ({ input }) => {
       const count = await prisma.user.count({
-        where: createUserWhereInput(input),
+        where: createAdminRBACWhereInput(input),
       })
       return count
     }),
@@ -80,4 +82,16 @@ export const adminRBACRoute = {
         }), {...defaultRecord})
       }
     }),
+  findById: authorized
+    .input(AdminRBACSchema.pick({ id: true }))
+    .output(AdminRBACSchema)
+    .handler(async ({ input }) => {
+      const user = await prisma.user.findUnique({
+        where: { id: input.id },
+      })
+      if (!user) {
+        throw new Error('User not found')
+      }
+      return parseAdminRBACData(user)
+    })
 }

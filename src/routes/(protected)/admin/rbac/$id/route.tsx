@@ -1,16 +1,15 @@
-import { authClient } from '#/lib/auth-client';
-import { createFileRoute, Outlet } from '@tanstack/react-router'
+import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
+
+import { adminRBACUrls } from '#/features/admin/rbac/admin-rbac-const';
+import { adminRBACGetUserById } from '#/features/admin/rbac/admin-rbac-server';
 
 export const Route = createFileRoute('/(protected)/admin/rbac/$id')({
   component: RouteComponent,
   beforeLoad: async ({ params: { id }, context }) => {
-    const { data, error } = await authClient.admin.getUser({
-      query: {
-        id
-      },
-    });
-    if (error) {
-      throw new Response(error.message, { status: error.status || 500 });
+    const data = await adminRBACGetUserById({ data: { id } });
+
+    if (!data) {
+      redirect({ to: adminRBACUrls.list })
     }
     return {
       ...context,

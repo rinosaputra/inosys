@@ -1,6 +1,6 @@
 import { formOptions } from "@tanstack/react-form"
-import { Link } from "@tanstack/react-router"
 import { ArrowLeft } from "lucide-react"
+import { Link } from "@tanstack/react-router"
 
 import { withForm } from "#/integrations/tanstack-form/form-hook"
 
@@ -8,26 +8,23 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Separator } from "#/components/ui/separator"
 import { Button } from "#/components/ui/button"
 
-import { AdminRBACCreateSchema, type AdminRBACCreate } from "./admin-rbac-schema"
+import { AdminRBACChangeRoleSchema, type AdminRBACChangeRole } from "./admin-rbac-schema"
 import { adminRBACRoleOptions, adminRBACUrls } from "./admin-rbac-const"
 
-const defaultValues: AdminRBACCreate = {
-  name: '',
-  email: '',
-  role: 'member',
-  password: '',
+const defaultValues: AdminRBACChangeRole = {
+  role: 'member'
 }
 
-export const adminRBACCreateFormOption = formOptions({
+export const adminRBACChangeRoleFormOption = formOptions({
   defaultValues,
-  validators: { onSubmit: AdminRBACCreateSchema }
+  validators: { onSubmit: AdminRBACChangeRoleSchema }
 })
 
-export const AdminRBACCreateForm = withForm({
-  ...adminRBACCreateFormOption,
+export const AdminRBACChangeRoleForm = withForm({
+  ...adminRBACChangeRoleFormOption,
   props: {
-    title: "Buat Pengguna Baru - RBAC",
-    description: "Form untuk membuat pengguna baru di admin RBAC."
+    title: "Edit Pengguna - RBAC",
+    description: "Form untuk mengedit pengguna di admin RBAC."
   },
   render: ({ form, title, description }) => <form onSubmit={(e) => {
     e.preventDefault()
@@ -51,20 +48,6 @@ export const AdminRBACCreateForm = withForm({
       </CardHeader>
       <Separator />
       <CardContent className="space-y-4">
-        {/* Name Field */}
-        <form.AppField name="name">{({ TextField }) => <TextField
-          label="Name"
-        />}</form.AppField>
-        {/* Email Field */}
-        <form.AppField name="email">{({ TextField }) => <TextField
-          label="Email"
-          type="email"
-          description="Pastikan email yang dimasukkan valid dan belum digunakan oleh pengguna lain."
-        />}</form.AppField>
-        {/* Password Field */}
-        <form.AppField name="password">{({ TextField }) => <TextField
-          label="Password"
-        />}</form.AppField>
         {/* Role Field */}
         <form.AppField name="role">{({ RadioGroupField }) => <RadioGroupField
           label="Role"
@@ -75,8 +58,8 @@ export const AdminRBACCreateForm = withForm({
       <CardFooter>
         <form.AppForm>
           <form.SubmitForm
-            label="Buat Pengguna"
-            loadingLabel="Membuat..."
+            label="Ubah Role"
+            loadingLabel="Menyimpan..."
           />
         </form.AppForm>
       </CardFooter>

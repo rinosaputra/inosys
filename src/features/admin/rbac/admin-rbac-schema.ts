@@ -38,21 +38,16 @@ export const AdminRBACQuerySchema = dataSearchSchema
 
 export type AdminRBACQuery = z.infer<typeof AdminRBACQuerySchema>
 
-export const AdminRBACStatusUpdateSchema = AdminRBACSchema
-  .pick({
-    id: true,
-    status: true,
-  })
+export const AdminRBACChangeRoleSchema = AdminRBACSchema.pick({
+  role: true,
+})
 
-export type AdminRBACStatusUpdate = z.infer<typeof AdminRBACStatusUpdateSchema>
+export type AdminRBACChangeRole = z.infer<typeof AdminRBACChangeRoleSchema>
 
 export const AdminRBACChangePasswordSchema = z
   .object({
     password: z.string().min(6, 'Password must be at least 6 characters long')
   })
-  .and(AdminRBACSchema.pick({
-    id: true,
-  }))
 
 export type AdminRBACChangePassword = z.infer<typeof AdminRBACChangePasswordSchema>
 
@@ -70,7 +65,6 @@ export type AdminRBACCreate = z.infer<typeof AdminRBACCreateSchema>
 
 export const AdminRBACUpdateSchema = AdminRBACSchema
   .pick({
-    id: true,
     name: true,
   })
 
