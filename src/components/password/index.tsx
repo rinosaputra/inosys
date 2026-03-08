@@ -14,6 +14,9 @@ export interface PasswordInputProps
   showStrength?: boolean
   showStrengthFeedback?: boolean
   error?: boolean
+
+  // Add default show password state for controlled usage
+  defaultShowPassword?: boolean
 }
 
 /**
@@ -65,11 +68,12 @@ const PasswordInput = React.forwardRef<HTMLInputElement, PasswordInputProps>(
       showStrengthFeedback = true,
       error = false,
       value = "",
+      defaultShowPassword = false,
       ...props
     },
     ref
   ) => {
-    const [showPassword, setShowPassword] = React.useState(false)
+    const [showPassword, setShowPassword] = React.useState(() => defaultShowPassword)
 
     const togglePasswordVisibility = () => {
       setShowPassword((prev) => !prev)
