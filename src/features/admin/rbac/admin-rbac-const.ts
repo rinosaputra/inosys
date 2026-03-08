@@ -1,6 +1,12 @@
 import type { Role } from "#/integrations/better-auth/rbac/permission";
 
-export const roleOptions: {
+export const adminRBACUrls = {
+  list: '/admin/rbac',
+  create: '/admin/rbac/create',
+  edit: (id: string) => `/admin/rbac/${id}/edit`,
+}
+
+export const adminRBACRoleOptions: {
   value: Role,
   label: string,
   description: string,

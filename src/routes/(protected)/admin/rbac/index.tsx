@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, Link } from '@tanstack/react-router'
 import z from 'zod'
 
 import { createMeta, type CreateMetaInput } from '#/lib/seo'
@@ -14,6 +14,7 @@ import { orpc } from '#/integrations/orpc/client'
 import { adminRBACColumns } from '#/features/admin/rbac/admin-rbac-columns'
 import type { AdminRBACQuery } from '#/features/admin/rbac/admin-rbac-schema'
 import { AdminRBACQuerySchema, AdminRBACRoleSchema } from '#/features/admin/rbac/admin-rbac-schema'
+import { adminRBACUrls } from '#/features/admin/rbac/admin-rbac-const'
 
 const metadata: CreateMetaInput = {
   title: "User Management - RBAC",
@@ -54,8 +55,10 @@ function RouteComponent() {
           </CardDescription>
         </div>
         <div>
-          <Button size="sm">
-            Create New
+          <Button size="sm" asChild>
+            <Link to={adminRBACUrls.create}>
+              Create New
+            </Link>
           </Button>
         </div>
       </div>
