@@ -6,7 +6,10 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Separator } from "#/components/ui/separator"
 
 import { AdminRBACCreateSchema, type AdminRBACCreate } from "./admin-rbac-schema"
-import { adminRBACRoleOptions } from "./admin-rbac-const"
+import { adminRBACRoleOptions, adminRBACUrls } from "./admin-rbac-const"
+import { Button } from "#/components/ui/button"
+import { Link } from "@tanstack/react-router"
+import { ArrowLeft } from "lucide-react"
 
 const defaultValues: AdminRBACCreate = {
   name: '',
@@ -32,6 +35,14 @@ export const AdminRBACFormCreate = withForm({
   }}>
     <Card>
       <CardHeader>
+        <div>
+          <Button asChild variant="link" size="sm">
+            <Link to={adminRBACUrls.list}>
+              <ArrowLeft />
+              Kembali
+            </Link>
+          </Button>
+        </div>
         <CardTitle>{title}</CardTitle>
         <CardDescription>
           {description}

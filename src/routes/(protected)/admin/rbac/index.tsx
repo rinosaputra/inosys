@@ -14,7 +14,7 @@ import { orpc } from '#/integrations/orpc/client'
 import { adminRBACColumns } from '#/features/admin/rbac/admin-rbac-columns'
 import type { AdminRBACQuery } from '#/features/admin/rbac/admin-rbac-schema'
 import { AdminRBACQuerySchema, AdminRBACRoleSchema } from '#/features/admin/rbac/admin-rbac-schema'
-import { adminRBACUrls } from '#/features/admin/rbac/admin-rbac-const'
+import { adminRBACQueryKey, adminRBACUrls } from '#/features/admin/rbac/admin-rbac-const'
 
 const metadata: CreateMetaInput = {
   title: "User Management - RBAC",
@@ -66,7 +66,7 @@ function RouteComponent() {
     <Separator />
     <CardContent>
       <DataTable {...{
-        name: "admin-rbac",
+        name: adminRBACQueryKey,
         columns: adminRBACColumns,
         navigate,
         search,

@@ -1,5 +1,7 @@
 import type { Role } from "#/integrations/better-auth/rbac/permission";
 
+export const adminRBACQueryKey = "admin-rbac"
+
 export const adminRBACUrls = {
   list: '/admin/rbac',
   create: '/admin/rbac/create',
