@@ -10,7 +10,7 @@ import type {
   UpdatePasswordValues,
   UpdateProfileValues
 } from './schema'
-// import { getContext } from '#/integrations/tanstack-query/root-provider'
+import { getContext } from '#/integrations/tanstack-query/root-provider'
 
 const queryKey = (...keys: string[]) => ['account', ...keys]
 
@@ -108,7 +108,7 @@ export const useAccountSessionLists = () => {
 }
 
 export const useAccountRevokeSession = () => {
-  // const { queryClient } = getContext()
+  const { queryClient } = getContext()
   const action = useMutation({
     mutationFn: async (token: string) => {
       const response = await authClient.revokeSession({
@@ -125,9 +125,9 @@ export const useAccountRevokeSession = () => {
     revokeSession: (token: string) => toast.promise(action.mutateAsync(token), {
       loading: 'Revoking session...',
       success: () => {
-        // queryClient.invalidateQueries({
-        //   queryKey: queryKey(),
-        // })
+        queryClient.invalidateQueries({
+          queryKey: queryKey(),
+        })
         return 'Session revoked successfully'
       },
       error: (err) => err.message || 'Failed to revoke session',
@@ -136,7 +136,7 @@ export const useAccountRevokeSession = () => {
 }
 
 export const useAccountRevokeAllSession = () => {
-  // const { queryClient } = getContext()
+  const { queryClient } = getContext()
   const action = useMutation({
     mutationFn: async () => {
       const response = await authClient.revokeOtherSessions({})
@@ -151,9 +151,9 @@ export const useAccountRevokeAllSession = () => {
     revokeAllSessions: () => toast.promise(action.mutateAsync(), {
       loading: 'Revoking all sessions...',
       success: () => {
-        // queryClient.invalidateQueries({
-        //   queryKey: queryKey(),
-        // })
+        queryClient.invalidateQueries({
+          queryKey: queryKey(),
+        })
         return 'Session revoked successfully'
       },
       error: (err) => err.message || 'Failed to revoke session',
