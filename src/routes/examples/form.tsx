@@ -39,6 +39,14 @@ const FormSchema = z.object({
   email: z.email('Invalid email address'),
   bio: z.string().min(10, 'Bio must be at least 10 characters').max(500, 'Bio must be less than 500 characters'),
   gender: z.enum(['male', 'female'], 'Please select a gender'),
+  subscribe: z.boolean(),
+  notification: z.boolean(),
+  plan: z.enum(['free', 'pro', 'enterprise'], 'Please select a plan'),
+  addPackages: z.array(z.enum([
+    'package-a',
+    'package-b',
+    'package-c',
+  ])).min(1, 'Please select at least one package'),
 })
 
 type FormValues = z.infer<typeof FormSchema>
@@ -48,6 +56,10 @@ const FormDefaultValues: FormValues = {
   email: '',
   bio: '',
   gender: 'male',
+  subscribe: false,
+  plan: 'free',
+  addPackages: [],
+  notification: false,
 }
 
 function FormExample() {
@@ -116,6 +128,48 @@ function FormExample() {
                     { value: 'male', label: 'Male' },
                     { value: 'female', label: 'Female' },
                   ]}
+                />
+              )}
+            </form.AppField>
+            <form.AppField name="subscribe">
+              {(field) => (
+                <field.CheckboxField
+                  label="Subscribe to newsletter"
+                  description="Get updates and news delivered to your inbox."
+                />
+              )}
+            </form.AppField>
+            <form.AppField name="plan">
+              {(field) => (
+                <field.RadioGroupField
+                  label="Select Plan"
+                  description="Choose the plan that best suits your needs."
+                  options={[
+                    { value: 'free', label: 'Free' },
+                    { value: 'pro', label: 'Pro' },
+                    { value: 'enterprise', label: 'Enterprise' },
+                  ]}
+                />
+              )}
+            </form.AppField>
+            <form.AppField name="addPackages">
+              {(field) => (
+                <field.MultipleCheckboxField
+                  label="Additional Packages"
+                  description="Select the additional packages you want to include."
+                  options={[
+                    { value: 'package-a', label: 'Package A' },
+                    { value: 'package-b', label: 'Package B' },
+                    { value: 'package-c', label: 'Package C' },
+                  ]}
+                />
+              )}
+            </form.AppField>
+            <form.AppField name="notification">
+              {(field) => (
+                <field.SwitchField
+                  label="Enable Notifications"
+                  description="Turn on to receive notifications about updates and offers."
                 />
               )}
             </form.AppField>
