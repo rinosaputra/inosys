@@ -1,6 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import z from "zod";
-import { useForm } from "@tanstack/react-form"
+import { formOptions } from "@tanstack/react-form"
+import { toast } from "sonner";
+
+import { createMeta, type CreateMetaInput } from "#/lib/seo";
+import { AUTH_IS_AUTH_URL, SITE_TITLE, SITE_URL } from "#/lib/site";
+import { authClient } from "#/lib/auth-client";
+import { useAppForm, withForm } from "#/integrations/tanstack-form/form-hook";
 
 import { Button } from "@/components/ui/button"
 import {
@@ -11,12 +17,7 @@ import {
   FieldLabel,
   FieldSeparator,
 } from "@/components/ui/field"
-import { Input } from "@/components/ui/input"
-import { createMeta, type CreateMetaInput } from "#/lib/seo";
-import { SITE_TITLE, SITE_URL } from "#/lib/site";
 import { PasswordInput } from "#/components/password";
-import { toast } from "sonner";
-import { authClient } from "#/lib/auth-client";
 import { passwordConfirmationSchema } from "#/components/password/schema";
 
 const metadata: CreateMetaInput = {
@@ -32,22 +33,119 @@ export const Route = createFileRoute("/(auth)/register")({
   head: () => createMeta(metadata),
 });
 
-const RegisterSchema = z.object({
-  name: z.string().nonempty("Please enter your name."),
-  email: z.email("Please enter a valid email address.")
-}).and(passwordConfirmationSchema)
+const RegisterSchema = z
+  .object({
+    name: z.string().nonempty("Please enter your name."),
+    email: z.email("Please enter a valid email address.")
+  })
+  .and(passwordConfirmationSchema)
+
+type RegisterValues = z.infer<typeof RegisterSchema>
+
+const defaultValues: RegisterValues = {
+  name: "",
+  email: "",
+  password: "",
+  confirmPassword: "",
+}
+
+const RegisterFormOptions = formOptions({
+  defaultValues,
+  validators: {
+    onSubmit: RegisterSchema,
+  },
+})
+
+const RegisterForm = withForm({
+  ...RegisterFormOptions,
+  render: ({ form }) => <>
+    {/* Name Input */}
+    <form.AppField name="name">
+      {({ TextField }) => <TextField
+        label="Name"
+        placeholder="Enter your name"
+        autoComplete="off"
+        type="text"
+      />}
+    </form.AppField>
+    {/* Email Input */}
+    <form.AppField name="email">
+      {({ TextField }) => <TextField
+        label="Email"
+        placeholder="Enter your email"
+        autoComplete="off"
+        type="email"
+      />}
+    </form.AppField>
+    {/* Password Input */}
+    <form.Field
+      name="password"
+      children={(field) => {
+        const isInvalid =
+          field.state.meta.isTouched && !field.state.meta.isValid
+        return (
+          <Field data-invalid={isInvalid}>
+            <FieldLabel htmlFor={field.name}>Password</FieldLabel>
+            <PasswordInput
+              id={field.name}
+              name={field.name}
+              value={field.state.value}
+              onBlur={field.handleBlur}
+              onChange={(e) => field.handleChange(e.target.value)}
+              aria-invalid={isInvalid}
+              placeholder="Enter your password"
+              autoComplete="off"
+              showStrength
+              showStrengthFeedback
+            />
+            {isInvalid && (
+              <FieldError errors={field.state.meta.errors} />
+            )}
+          </Field>
+        )
+      }}
+    />
+    {/* Confirm Password Input */}
+    <form.Field
+      name="confirmPassword"
+      children={(field) => {
+        const isInvalid =
+          field.state.meta.isTouched && !field.state.meta.isValid
+        return (
+          <Field data-invalid={isInvalid}>
+            <FieldLabel htmlFor={field.name}>Confirm Password</FieldLabel>
+            <PasswordInput
+              id={field.name}
+              name={field.name}
+              value={field.state.value}
+              onBlur={field.handleBlur}
+              onChange={(e) => field.handleChange(e.target.value)}
+              aria-invalid={isInvalid}
+              placeholder="Confirm your password"
+              autoComplete="off"
+            />
+            {isInvalid && (
+              <FieldError errors={field.state.meta.errors} />
+            )}
+          </Field>
+        )
+      }}
+    />
+    <Field>
+      <form.AppForm>
+        <form.SubmitForm
+          label="Register"
+          loadingLabel="Registering..."
+        />
+      </form.AppForm>
+    </Field>
+  </>
+})
 
 function RegisterPage() {
-  const form = useForm({
-    validators: {
-      onSubmit: RegisterSchema
-    },
-    defaultValues: {
-      name: "",
-      email: "",
-      password: "",
-      confirmPassword: "",
-    },
+  const navigate = Route.useNavigate()
+  const form = useAppForm({
+    ...RegisterFormOptions,
     onSubmit({ value }) {
       toast.promise(
         async () => {
@@ -64,6 +162,9 @@ function RegisterPage() {
         {
           loading: "Registering...",
           success: () => {
+            navigate({
+              to: AUTH_IS_AUTH_URL
+            })
             return "Register successful!"
           },
           error: e => {
@@ -87,117 +188,7 @@ function RegisterPage() {
           Enter your email and password to create your account.
         </p>
       </div>
-      {/* Name Input */}
-      <form.Field
-        name="name"
-        children={(field) => {
-          const isInvalid =
-            field.state.meta.isTouched && !field.state.meta.isValid
-          return (
-            <Field data-invalid={isInvalid}>
-              <FieldLabel htmlFor={field.name}>Name</FieldLabel>
-              <Input
-                id={field.name}
-                name={field.name}
-                value={field.state.value}
-                onBlur={field.handleBlur}
-                onChange={(e) => field.handleChange(e.target.value)}
-                aria-invalid={isInvalid}
-                placeholder="Enter your name"
-                autoComplete="off"
-                type="text"
-              />
-              {isInvalid && (
-                <FieldError errors={field.state.meta.errors} />
-              )}
-            </Field>
-          )
-        }}
-      />
-      {/* Email Input */}
-      <form.Field
-        name="email"
-        children={(field) => {
-          const isInvalid =
-            field.state.meta.isTouched && !field.state.meta.isValid
-          return (
-            <Field data-invalid={isInvalid}>
-              <FieldLabel htmlFor={field.name}>Email</FieldLabel>
-              <Input
-                id={field.name}
-                name={field.name}
-                value={field.state.value}
-                onBlur={field.handleBlur}
-                onChange={(e) => field.handleChange(e.target.value)}
-                aria-invalid={isInvalid}
-                placeholder="Enter your email"
-                autoComplete="off"
-                type="email"
-              />
-              {isInvalid && (
-                <FieldError errors={field.state.meta.errors} />
-              )}
-            </Field>
-          )
-        }}
-      />
-      {/* Password Input */}
-      <form.Field
-        name="password"
-        children={(field) => {
-          const isInvalid =
-            field.state.meta.isTouched && !field.state.meta.isValid
-          return (
-            <Field data-invalid={isInvalid}>
-              <FieldLabel htmlFor={field.name}>Password</FieldLabel>
-              <PasswordInput
-                id={field.name}
-                name={field.name}
-                value={field.state.value}
-                onBlur={field.handleBlur}
-                onChange={(e) => field.handleChange(e.target.value)}
-                aria-invalid={isInvalid}
-                placeholder="Enter your password"
-                autoComplete="off"
-                showStrength
-                showStrengthFeedback
-              />
-              {isInvalid && (
-                <FieldError errors={field.state.meta.errors} />
-              )}
-            </Field>
-          )
-        }}
-      />
-      {/* Confirm Password Input */}
-      <form.Field
-        name="confirmPassword"
-        children={(field) => {
-          const isInvalid =
-            field.state.meta.isTouched && !field.state.meta.isValid
-          return (
-            <Field data-invalid={isInvalid}>
-              <FieldLabel htmlFor={field.name}>Confirm Password</FieldLabel>
-              <PasswordInput
-                id={field.name}
-                name={field.name}
-                value={field.state.value}
-                onBlur={field.handleBlur}
-                onChange={(e) => field.handleChange(e.target.value)}
-                aria-invalid={isInvalid}
-                placeholder="Confirm your password"
-                autoComplete="off"
-              />
-              {isInvalid && (
-                <FieldError errors={field.state.meta.errors} />
-              )}
-            </Field>
-          )
-        }}
-      />
-      <Field>
-        <Button type="submit">Register</Button>
-      </Field>
+      <RegisterForm form={form} />
       <FieldSeparator>Or continue with</FieldSeparator>
       <Field>
         <Button variant="outline" type="button">
