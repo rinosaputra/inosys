@@ -1,7 +1,9 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { Link } from 'lucide-react'
+
+import { createMeta, type CreateMetaInput } from '#/lib/seo';
+
 import { ACCOUNT_URLs } from './-components/urls';
-import type { CreateMetaInput } from '#/lib/seo';
 
 const metadata: CreateMetaInput = {
   title: 'Overview - Account Settings',
@@ -10,6 +12,7 @@ const metadata: CreateMetaInput = {
 
 export const Route = createFileRoute('/(protected)/account/')({
   component: AccountLandingPage,
+  head: () => createMeta(metadata),
 })
 
 function AccountLandingPage() {

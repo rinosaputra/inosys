@@ -3,7 +3,11 @@ import { Ban, Computer, LogOut, Phone } from 'lucide-react'
 import { UAParser } from 'ua-parser-js'
 import { useMemo } from 'react'
 import { formatDistanceToNow } from 'date-fns';
-import type { CreateMetaInput } from '#/lib/seo'
+
+import type { Auth } from '#/lib/auth';
+import { locale } from '#/lib/date';
+import { createMeta, type CreateMetaInput } from '#/lib/seo'
+
 import { Button } from '#/components/ui/button'
 import {
   Field,
@@ -11,7 +15,6 @@ import {
 } from '#/components/ui/field'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '#/components/ui/card'
 import { Separator } from '#/components/ui/separator'
-import { useAccountRevokeAllSession, useAccountRevokeSession, useAccountSessionLists } from './-components/hook'
 
 import {
   Empty,
@@ -29,10 +32,10 @@ import {
   ItemMedia,
   ItemTitle,
 } from "@/components/ui/item"
-import type { Auth } from '#/lib/auth'
-import { Badge } from '#/components/ui/badge'
-import { locale } from '#/lib/date';
+import { Badge } from '#/components/ui/badge';
 import { Spinner } from '#/components/ui/spinner';
+
+import { useAccountRevokeAllSession, useAccountRevokeSession, useAccountSessionLists } from './-components/hook'
 
 const metadata: CreateMetaInput = {
   title: 'Session Management',
@@ -41,6 +44,7 @@ const metadata: CreateMetaInput = {
 
 export const Route = createFileRoute('/(protected)/account/sessions')({
   component: AccountSessionsPage,
+  head: () => createMeta(metadata),
 })
 
 function AccountSessionsPage() {

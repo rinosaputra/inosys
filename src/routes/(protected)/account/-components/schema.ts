@@ -14,7 +14,7 @@ export const UpdateEmailSchema = z.object({
   email: z.email('Please enter a valid email address.'),
 })
 
-export type UpdateEmailInput = z.infer<typeof UpdateEmailSchema>
+export type UpdateEmailValues = z.infer<typeof UpdateEmailSchema>
 
 export const UpdatePasswordSchema = z
   .object({
@@ -27,4 +27,4 @@ export const UpdatePasswordSchema = z
     path: ['confirmNewPassword'],
   })
 
-export type UpdatePasswordInput = z.infer<typeof UpdatePasswordSchema>
+export type UpdatePasswordValues = z.infer<typeof UpdatePasswordSchema>
