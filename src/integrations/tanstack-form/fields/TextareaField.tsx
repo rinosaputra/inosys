@@ -21,8 +21,6 @@ type TextareaFieldProps = {
 export function TextareaField({
   label,
   description,
-  className,
-  placeholder,
   ...props
 }: TextareaFieldProps) {
   const field = useFieldContext<string>()
@@ -31,13 +29,11 @@ export function TextareaField({
 
   return (
     <Field data-invalid={isInvalid}>
-      <FieldLabel>{label}</FieldLabel>
+      <FieldLabel htmlFor={field.name}>{label}</FieldLabel>
 
       <FieldContent>
         <Textarea
           {...props}
-          className={className}
-          placeholder={placeholder}
           name={field.name}
           value={field.state.value ?? ''}
           onBlur={field.handleBlur}

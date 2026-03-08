@@ -23,10 +23,6 @@ type TextFieldProps = {
 export function TextField({
   label,
   description,
-  className,
-  placeholder,
-  autoComplete,
-  inputMode,
   ...props
 }: TextFieldProps) {
   const field = useFieldContext<string>()
@@ -35,15 +31,11 @@ export function TextField({
 
   return (
     <Field data-invalid={isInvalid}>
-      <FieldLabel>{label}</FieldLabel>
+      <FieldLabel htmlFor={field.name}>{label}</FieldLabel>
 
       <FieldContent>
         <Input
           {...props}
-          className={className}
-          placeholder={placeholder}
-          autoComplete={autoComplete}
-          inputMode={inputMode}
           name={field.name}
           value={field.state.value ?? ''}
           onBlur={field.handleBlur}

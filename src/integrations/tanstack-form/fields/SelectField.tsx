@@ -11,25 +11,25 @@ import {
 import type { LucideIcon } from 'lucide-react'
 import { cn } from '#/lib/utils'
 
-interface Option {
-  value: string
+interface Option<T> {
+  value: T
   label: string
   icon?: LucideIcon
 }
 
-type SelectFieldProps = {
+type SelectFieldProps<T> = {
   label: string
   description?: React.ReactNode
   placeholder?: string,
   className?: string,
-  options: Option[]
-  empty?: Option
+  options: Option<T>[]
+  empty?: Option<string>
 } & Omit<
   React.ComponentProps<typeof Select>,
   'value' | 'defaultValue' | 'onChange' | 'onBlur'
 >
 
-export function SelectField({
+export function SelectField<T extends string = string>({
   label,
   description,
   className,
@@ -37,15 +37,15 @@ export function SelectField({
   options,
   empty,
   ...props
-}: SelectFieldProps) {
-  const field = useFieldContext<string>()
+}: SelectFieldProps<T>) {
+  const field = useFieldContext<T>()
 
   const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid
 
   return (
     <Field data-invalid={isInvalid} orientation="responsive">
       <FieldContent>
-        <FieldLabel>{label}</FieldLabel>
+        <FieldLabel htmlFor={field.name}>{label}</FieldLabel>
         {description ? <FieldDescription>{description}</FieldDescription> : null}
         <FieldError
           errors={field.state.meta.errors?.map((e) => ({
@@ -57,7 +57,7 @@ export function SelectField({
         {...props}
         name={field.name}
         value={field.state.value}
-        onValueChange={field.handleChange}
+        onValueChange={(v) => field.handleChange(v as T)}
       >
         <SelectTrigger
           id={field.name}
