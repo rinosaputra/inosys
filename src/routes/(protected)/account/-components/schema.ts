@@ -8,7 +8,7 @@ export const UpdateProfileSchema = z.object({
     .or(z.literal('')),
 })
 
-export type UpdateProfileInput = z.infer<typeof UpdateProfileSchema>
+export type UpdateProfileValues = z.infer<typeof UpdateProfileSchema>
 
 export const UpdateEmailSchema = z.object({
   email: z.email('Please enter a valid email address.'),

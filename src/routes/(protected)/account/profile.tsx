@@ -1,6 +1,8 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useForm } from '@tanstack/react-form'
+
 import type { CreateMetaInput } from '#/lib/seo'
+
 import { Button } from '#/components/ui/button'
 import {
   Field,
@@ -11,9 +13,10 @@ import {
 import { Input } from '#/components/ui/input'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '#/components/ui/card'
 import { Separator } from '#/components/ui/separator'
-import { UpdateProfileSchema } from './-components/schema'
-import { useAccountUpdateProfile } from './-components/hook'
 import { Spinner } from '#/components/ui/spinner'
+
+import { UpdateProfileSchema, type UpdateProfileValues } from './-components/schema'
+import { useAccountUpdateProfile } from './-components/hook'
 
 const metadata: CreateMetaInput = {
   title: 'Profile Settings',
@@ -23,6 +26,11 @@ const metadata: CreateMetaInput = {
 export const Route = createFileRoute('/(protected)/account/profile')({
   component: AccountProfilePage,
 })
+
+const defaultValues: UpdateProfileValues = {
+  name: '',
+  avatarUrl: '',
+}
 
 function AccountProfilePage() {
   const { auth: { user } } = Route.useRouteContext()

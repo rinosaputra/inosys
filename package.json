@@ -29,7 +29,8 @@
     "sonner": "^2.0.7",
     "tailwind-merge": "^3.5.0",
     "tailwindcss": "^4.1.18",
-    "ua-parser-js": "^2.0.9"
+    "ua-parser-js": "^2.0.9",
+    "zustand": "^5.0.11"
   },
   "description": "Inosys: TypeScript (Node 20) app with email/password auth + JWT access token, Knex + MySQL (XAMPP local dev), and Vitest tests. Workflow: feature/* -> dev -> main.",
   "devDependencies": {
@@ -96,7 +97,8 @@
     "format": "prettier --check .",
     "lint": "eslint",
     "preview": "vite preview",
-    "test": "vitest run"
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
   },
   "type": "module"
 }
