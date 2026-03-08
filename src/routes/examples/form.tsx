@@ -2,9 +2,10 @@ import { useState } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import { z } from 'zod'
 
-import { useAppForm } from '#/integrations/tanstack-form/form-hook'
+import { useAppForm, withForm } from '#/integrations/tanstack-form/form-hook'
 import { FieldGroup } from '#/components/ui/field'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '#/components/ui/card'
+import { formOptions } from '@tanstack/react-form'
 
 export const Route = createFileRoute('/examples/form')({
   component: ExamplesFormsPage,
@@ -62,12 +63,144 @@ const FormDefaultValues: FormValues = {
   notification: false,
 }
 
+const formExampleOptions = formOptions({
+  defaultValues: FormDefaultValues,
+  validators: { onSubmit: FormSchema },
+})
+
+const WithFormExample = withForm({
+  ...formExampleOptions,
+  render: ({ form }) => <form
+    className="mt-5 flex flex-col gap-6"
+    onSubmit={(e) => {
+      e.preventDefault()
+      void form.handleSubmit()
+    }}
+  >
+    <FieldGroup>
+      <form.AppField name="name">
+        {(field) => (
+          <field.TextField
+            label="Name"
+            placeholder="Your name"
+            autoComplete="name"
+          />
+        )}
+      </form.AppField>
+
+      <form.AppField name="email">
+        {(field) => (
+          <field.TextField
+            label="Email"
+            placeholder="you@example.com"
+            autoComplete="email"
+            inputMode="email"
+          />
+        )}
+      </form.AppField>
+      <form.AppField name="bio">
+        {(field) => (
+          <field.TextareaField
+            label="Bio"
+            placeholder="Write something..."
+            rows={5}
+          />
+        )}
+      </form.AppField>
+      <form.AppField name="gender">
+        {(field) => (
+          <field.SelectField
+            label="Gender"
+            options={[
+              { value: 'male', label: 'Male' },
+              { value: 'female', label: 'Female' },
+            ]}
+          />
+        )}
+      </form.AppField>
+      <form.AppField name="subscribe">
+        {(field) => (
+          <field.CheckboxField
+            label="Subscribe to newsletter"
+            placeholder="Get updates and news delivered to your inbox."
+          />
+        )}
+      </form.AppField>
+      <form.AppField name="plan">
+        {(field) => (
+          <field.RadioGroupField
+            label="Select Plan"
+            description="Choose the plan that best suits your needs."
+            options={[
+              {
+                value: 'free',
+                label: 'Free',
+                description: 'Basic features for personal use',
+              },
+              {
+                value: 'pro',
+                label: 'Pro',
+                description: 'Advanced features for professionals',
+              },
+              {
+                value: 'enterprise',
+                label: 'Enterprise',
+                description: 'All features for large organizations',
+              },
+            ]}
+          />
+        )}
+      </form.AppField>
+      <form.AppField name="addPackages">
+        {(field) => (
+          <field.MultipleCheckboxField
+            label="Additional Packages"
+            description="Select the additional packages you want to include."
+            options={[
+              {
+                value: 'package-a',
+                label: 'Package A',
+              },
+              {
+                value: 'package-b',
+                label: 'Package B',
+              },
+              {
+                value: 'package-c',
+                label: 'Package C',
+              },
+            ]}
+          />
+        )}
+      </form.AppField>
+      <form.AppField name="notification">
+        {(field) => (
+          <field.SwitchField
+            label="Enable Notifications"
+            description="Turn on to receive notifications about updates and offers."
+          />
+        )}
+      </form.AppField>
+    </FieldGroup>
+
+    <div className="flex items-center gap-3">
+      <form.AppForm>
+        <form.SubmitForm
+          label="Submit"
+          loadingLabel="Submitting..."
+        />
+        <form.ResetForm />
+      </form.AppForm>
+    </div>
+
+  </form>,
+})
+
 function FormExample() {
   const [submitted, setSubmitted] = useState<FormValues | undefined>(undefined)
 
   const form = useAppForm({
-    defaultValues: FormDefaultValues,
-    validators: { onSubmit: FormSchema },
+    ...formExampleOptions,
     onSubmit: async ({ value }) => {
       // Simulasi submit
       setSubmitted(value)
@@ -83,130 +216,7 @@ function FormExample() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form
-          className="mt-5 flex flex-col gap-6"
-          onSubmit={(e) => {
-            e.preventDefault()
-            void form.handleSubmit()
-          }}
-        >
-          <FieldGroup>
-            <form.AppField name="name">
-              {(field) => (
-                <field.TextField
-                  label="Name"
-                  placeholder="Your name"
-                  autoComplete="name"
-                />
-              )}
-            </form.AppField>
-
-            <form.AppField name="email">
-              {(field) => (
-                <field.TextField
-                  label="Email"
-                  placeholder="you@example.com"
-                  autoComplete="email"
-                  inputMode="email"
-                />
-              )}
-            </form.AppField>
-            <form.AppField name="bio">
-              {(field) => (
-                <field.TextareaField
-                  label="Bio"
-                  placeholder="Write something..."
-                  rows={5}
-                />
-              )}
-            </form.AppField>
-            <form.AppField name="gender">
-              {(field) => (
-                <field.SelectField
-                  label="Gender"
-                  options={[
-                    { value: 'male', label: 'Male' },
-                    { value: 'female', label: 'Female' },
-                  ]}
-                />
-              )}
-            </form.AppField>
-            <form.AppField name="subscribe">
-              {(field) => (
-                <field.CheckboxField
-                  label="Subscribe to newsletter"
-                  placeholder="Get updates and news delivered to your inbox."
-                />
-              )}
-            </form.AppField>
-            <form.AppField name="plan">
-              {(field) => (
-                <field.RadioGroupField
-                  label="Select Plan"
-                  description="Choose the plan that best suits your needs."
-                  options={[
-                    {
-                      value: 'free',
-                      label: 'Free',
-                      description: 'Basic features for personal use',
-                    },
-                    {
-                      value: 'pro',
-                      label: 'Pro',
-                      description: 'Advanced features for professionals',
-                    },
-                    {
-                      value: 'enterprise',
-                      label: 'Enterprise',
-                      description: 'All features for large organizations',
-                    },
-                  ]}
-                />
-              )}
-            </form.AppField>
-            <form.AppField name="addPackages">
-              {(field) => (
-                <field.MultipleCheckboxField
-                  label="Additional Packages"
-                  description="Select the additional packages you want to include."
-                  options={[
-                    {
-                      value: 'package-a',
-                      label: 'Package A',
-                    },
-                    {
-                      value: 'package-b',
-                      label: 'Package B',
-                    },
-                    {
-                      value: 'package-c',
-                      label: 'Package C',
-                    },
-                  ]}
-                />
-              )}
-            </form.AppField>
-            <form.AppField name="notification">
-              {(field) => (
-                <field.SwitchField
-                  label="Enable Notifications"
-                  description="Turn on to receive notifications about updates and offers."
-                />
-              )}
-            </form.AppField>
-          </FieldGroup>
-
-          <div className="flex items-center gap-3">
-            <form.AppForm>
-              <form.SubmitForm
-                label="Submit"
-                loadingLabel="Submitting..."
-              />
-              <form.ResetForm />
-            </form.AppForm>
-          </div>
-
-        </form>
+        <WithFormExample form={form} />
       </CardContent>
       <CardFooter>
         {submitted ? (
