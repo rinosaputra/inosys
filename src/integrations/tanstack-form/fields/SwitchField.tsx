@@ -13,7 +13,6 @@ import {
 type SwitchFieldProps = {
   label: string
   description?: React.ReactNode
-  placeholder?: string
 } & Omit<
   React.ComponentProps<typeof Switch>,
   'value' | 'defaultValue' | 'onChange' | 'onBlur'
@@ -23,7 +22,6 @@ export function SwitchField({
   label,
   description,
   className,
-  placeholder,
   ...props
 }: SwitchFieldProps) {
   const field = useFieldContext<boolean>()
@@ -37,7 +35,7 @@ export function SwitchField({
       className={cn(className)}
     >
       <FieldContent>
-        <FieldLabel htmlFor={field.name} className="font-normal">{placeholder}</FieldLabel>
+        <FieldLabel htmlFor={field.name} className="font-normal">{label}</FieldLabel>
         {description ? <FieldDescription>{description}</FieldDescription> : null}
         {isInvalid && (
           <FieldError errors={field.state.meta.errors} />
