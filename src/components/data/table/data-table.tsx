@@ -19,10 +19,7 @@ import { DataTableToolbar } from "./data-table-toolbar"
 import { DataTableColumnHeader } from "./data-table-column-header"
 import { DataTableRowActions, type DataTableRowActionsProps } from "./data-table-row-actions"
 import { toDataSearchSchema, toURLSearchParams, type DataSearch } from "../schema"
-
-export const getDataTableQueryKey = <T,>(name: T, ...props: unknown[]) => {
-  return ["data-table", name, ...props] as const
-}
+import { getDataTableQueryKey } from "./utils"
 
 interface DataTableProps<TData> {
   name: string
