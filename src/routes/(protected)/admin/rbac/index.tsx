@@ -13,13 +13,13 @@ import { orpc } from '#/integrations/orpc/client'
 
 import { adminRBACColumns } from '#/features/admin/rbac/admin-rbac-columns'
 import type { AdminRBACQuery } from '#/features/admin/rbac/admin-rbac-schema'
-import { AdminRBACQuerySchema, AdminRBACRoleSchema } from '#/features/admin/rbac/admin-rbac-schema'
+import { AdminRBACQuerySchema, AdminRBACRoleField } from '#/features/admin/rbac/admin-rbac-schema'
 import { adminRBACQueryKey, adminRBACUrls } from '#/features/admin/rbac/admin-rbac-const'
 
 const metadata: CreateMetaInput = {
   title: "User Management - RBAC",
   description: "Halaman untuk mengelola pengguna di admin RBAC.",
-  url: "/admin/rbac",
+  url: adminRBACUrls.list,
 }
 
 export const Route = createFileRoute('/(protected)/admin/rbac/')({
@@ -35,7 +35,7 @@ const parseQuery = (query: DataSearch): AdminRBACQuery => {
     ...query,
     search: query.search.name,
     filters: {
-      roles: AdminRBACRoleSchema.array().parse(Array.isArray(roles) ? roles : [roles]) || undefined,
+      roles: AdminRBACRoleField.array().parse(Array.isArray(roles) ? roles : [roles]) || undefined,
       isActive: statuses.length === 1 ? statuses[0] === 'active' : undefined,
     }
   }

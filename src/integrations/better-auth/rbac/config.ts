@@ -4,11 +4,12 @@ import {
   roles,
   defaultRole,
   adminRoles
- } from "./permission"
+} from "./permission"
 
 export const betterAuthAdminConfig = admin({
   ac,
   roles,
   defaultRole,
-  adminRoles
+  adminRoles,
+  adminUserIds: (process.env.RBAC_ADMIN_IDS || '').split(',').map(id => id.trim()).filter(Boolean)
 })

@@ -2,7 +2,7 @@ import { getDataTableQueryKey } from "#/components/data/table/utils"
 import { getContext } from "#/integrations/tanstack-query/root-provider"
 import { useMutation } from "@tanstack/react-query"
 import { adminRBACQueryKey } from "./admin-rbac-const"
-import type { AdminRBACCreate } from "./admin-rbac-schema"
+import type { AdminRBACCreate, AdminRBACUpdate } from "./admin-rbac-schema"
 import { authClient } from "#/lib/auth-client"
 
 export const useAdminRBACRevalidate = () => {
@@ -23,6 +23,21 @@ export const useAdminRBACCreate = () => useMutation({
     })
     if (response.error) {
       throw new Error(response.error.message || 'Failed to create user')
+    }
+    return response.data
+  }
+})
+
+export const useAdminRBACUpdate = () => useMutation({
+  mutationFn: async (data: AdminRBACUpdate) => {
+    const response = await authClient.admin.updateUser({
+      userId: data.id,
+      data: {
+        name: data.name,
+      }
+    })
+    if (response.error) {
+      throw new Error(response.error.message || 'Failed to update user')
     }
     return response.data
   }

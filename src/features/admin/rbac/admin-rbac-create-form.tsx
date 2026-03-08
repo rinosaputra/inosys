@@ -1,4 +1,6 @@
 import { formOptions } from "@tanstack/react-form"
+import { Link } from "@tanstack/react-router"
+import { ArrowLeft } from "lucide-react"
 
 import { withForm } from "#/integrations/tanstack-form/form-hook"
 
@@ -8,8 +10,6 @@ import { Separator } from "#/components/ui/separator"
 import { AdminRBACCreateSchema, type AdminRBACCreate } from "./admin-rbac-schema"
 import { adminRBACRoleOptions, adminRBACUrls } from "./admin-rbac-const"
 import { Button } from "#/components/ui/button"
-import { Link } from "@tanstack/react-router"
-import { ArrowLeft } from "lucide-react"
 
 const defaultValues: AdminRBACCreate = {
   name: '',
@@ -18,13 +18,13 @@ const defaultValues: AdminRBACCreate = {
   password: '',
 }
 
-export const adminRBACFormCreateOption = formOptions({
+export const adminRBACCreateFormOption = formOptions({
   defaultValues,
   validators: { onSubmit: AdminRBACCreateSchema }
 })
 
-export const AdminRBACFormCreate = withForm({
-  ...adminRBACFormCreateOption,
+export const AdminRBACCreateForm = withForm({
+  ...adminRBACCreateFormOption,
   props: {
     title: "Buat Pengguna Baru - RBAC",
     description: "Form untuk membuat pengguna baru di admin RBAC."
@@ -43,6 +43,7 @@ export const AdminRBACFormCreate = withForm({
             </Link>
           </Button>
         </div>
+        <Separator className="mb-4" />
         <CardTitle>{title}</CardTitle>
         <CardDescription>
           {description}
@@ -63,7 +64,6 @@ export const AdminRBACFormCreate = withForm({
         {/* Password Field */}
         <form.AppField name="password">{({ TextField }) => <TextField
           label="Password"
-          type="password"
         />}</form.AppField>
         {/* Role Field */}
         <form.AppField name="role">{({ RadioGroupField }) => <RadioGroupField

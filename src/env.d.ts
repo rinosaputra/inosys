@@ -24,6 +24,9 @@ declare global {
       readonly NODE_ENV: 'development' | 'production' | 'test'
       // Database connection variables
       readonly DATABASE_URL: string
+
+      // Env for RBAC
+      readonly RBAC_ADMIN_IDS: string
     }
   }
 }
