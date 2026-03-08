@@ -135,7 +135,7 @@ function FormExample() {
               {(field) => (
                 <field.CheckboxField
                   label="Subscribe to newsletter"
-                  description="Get updates and news delivered to your inbox."
+                  placeholder="Get updates and news delivered to your inbox."
                 />
               )}
             </form.AppField>
@@ -145,9 +145,21 @@ function FormExample() {
                   label="Select Plan"
                   description="Choose the plan that best suits your needs."
                   options={[
-                    { value: 'free', label: 'Free' },
-                    { value: 'pro', label: 'Pro' },
-                    { value: 'enterprise', label: 'Enterprise' },
+                    {
+                      value: 'free',
+                      label: 'Free',
+                      description: 'Basic features for personal use',
+                    },
+                    {
+                      value: 'pro',
+                      label: 'Pro',
+                      description: 'Advanced features for professionals',
+                    },
+                    {
+                      value: 'enterprise',
+                      label: 'Enterprise',
+                      description: 'All features for large organizations',
+                    },
                   ]}
                 />
               )}
@@ -158,9 +170,18 @@ function FormExample() {
                   label="Additional Packages"
                   description="Select the additional packages you want to include."
                   options={[
-                    { value: 'package-a', label: 'Package A' },
-                    { value: 'package-b', label: 'Package B' },
-                    { value: 'package-c', label: 'Package C' },
+                    {
+                      value: 'package-a',
+                      label: 'Package A',
+                    },
+                    {
+                      value: 'package-b',
+                      label: 'Package B',
+                    },
+                    {
+                      value: 'package-c',
+                      label: 'Package C',
+                    },
                   ]}
                 />
               )}
