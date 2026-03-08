@@ -1,6 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import z from "zod";
-import { useForm } from "@tanstack/react-form"
+import { formOptions } from "@tanstack/react-form"
+import { toast } from "sonner";
+
+import { createMeta, type CreateMetaInput } from "#/lib/seo";
+import { AUTH_IS_AUTH_URL, SITE_TITLE, SITE_URL } from "#/lib/site";
+import { authClient } from "#/lib/auth-client";
+import { useAppForm, withForm } from "#/integrations/tanstack-form/form-hook";
 
 import { Button } from "@/components/ui/button"
 import {
@@ -11,12 +17,7 @@ import {
   FieldLabel,
   FieldSeparator,
 } from "@/components/ui/field"
-import { Input } from "@/components/ui/input"
-import { createMeta, type CreateMetaInput } from "#/lib/seo";
-import { AUTH_IS_AUTH_URL, SITE_TITLE, SITE_URL } from "#/lib/site";
 import { PasswordInput } from "#/components/password";
-import { toast } from "sonner";
-import { authClient } from "#/lib/auth-client";
 
 const metadata: CreateMetaInput = {
   title: `Login - ${SITE_TITLE}`,
@@ -31,20 +32,87 @@ export const Route = createFileRoute("/(auth)/login")({
   head: () => createMeta(metadata),
 });
 
-const LoginSchema = z.object({
-  email: z.email("Please enter a valid email address."),
-  password: z.string().nonempty("Please enter your password."),
+const LoginSchema = z
+  .object({
+    email: z.email("Please enter a valid email address."),
+    password: z.string().nonempty("Please enter your password."),
+  })
+
+type LoginValues = z.infer<typeof LoginSchema>
+
+const defaultValues: LoginValues = {
+  email: "",
+  password: "",
+}
+
+const loginFormOptions = formOptions({
+  defaultValues,
+  validators: {
+    onSubmit: LoginSchema,
+  },
+})
+
+const LoginForm = withForm({
+  ...loginFormOptions,
+  render: ({ form }) => <>
+    {/* Email Input */}
+    <form.AppField name="email">
+      {({ TextField }) => <TextField
+        label="Email"
+        placeholder="Enter your email"
+        autoComplete="off"
+        type="email"
+      />}
+    </form.AppField>
+    {/* Password Input */}
+    <form.Field
+      name="password"
+      children={(field) => {
+        const isInvalid =
+          field.state.meta.isTouched && !field.state.meta.isValid
+        return (
+          <Field data-invalid={isInvalid}>
+            <div className="flex items-center">
+              <FieldLabel htmlFor={field.name}>Password</FieldLabel>
+              {/* @ts-ignore */}
+              <Link
+                href="/forgot-password"
+                className="ml-auto text-sm underline-offset-4 hover:underline"
+              >
+                Forgot your password?
+              </Link>
+            </div>
+            <PasswordInput
+              id={field.name}
+              name={field.name}
+              value={field.state.value}
+              onBlur={field.handleBlur}
+              onChange={(e) => field.handleChange(e.target.value)}
+              aria-invalid={isInvalid}
+              placeholder="Enter your password"
+              autoComplete="off"
+            />
+            {isInvalid && (
+              <FieldError errors={field.state.meta.errors} />
+            )}
+          </Field>
+        )
+      }}
+    />
+    <Field>
+      <form.AppForm>
+        <form.SubmitForm
+          label="Login"
+          loadingLabel="Logging in..."
+        />
+      </form.AppForm>
+    </Field>
+  </>
 })
 
 function LoginPage() {
-  const form = useForm({
-    validators: {
-      onSubmit: LoginSchema
-    },
-    defaultValues: {
-      email: "",
-      password: "",
-    },
+  const form = useAppForm({
+    ...loginFormOptions,
     onSubmit({ value }) {
       toast.promise(
         async () => {
@@ -84,71 +152,7 @@ function LoginPage() {
           Enter your email and password to access your account.
         </p>
       </div>
-      {/* Email Input */}
-      <form.Field
-        name="email"
-        children={(field) => {
-          const isInvalid =
-            field.state.meta.isTouched && !field.state.meta.isValid
-          return (
-            <Field data-invalid={isInvalid}>
-              <FieldLabel htmlFor={field.name}>Email</FieldLabel>
-              <Input
-                id={field.name}
-                name={field.name}
-                value={field.state.value}
-                onBlur={field.handleBlur}
-                onChange={(e) => field.handleChange(e.target.value)}
-                aria-invalid={isInvalid}
-                placeholder="Enter your email"
-                autoComplete="off"
-                type="email"
-              />
-              {isInvalid && (
-                <FieldError errors={field.state.meta.errors} />
-              )}
-            </Field>
-          )
-        }}
-      />
-      {/* Password Input */}
-      <form.Field
-        name="password"
-        children={(field) => {
-          const isInvalid =
-            field.state.meta.isTouched && !field.state.meta.isValid
-          return (
-            <Field data-invalid={isInvalid}>
-              <div className="flex items-center">
-                <FieldLabel htmlFor={field.name}>Password</FieldLabel>
-                {/* @ts-ignore */}
-                <Link
-                  href="/forgot-password"
-                  className="ml-auto text-sm underline-offset-4 hover:underline"
-                >
-                  Forgot your password?
-                </Link>
-              </div>
-              <PasswordInput
-                id={field.name}
-                name={field.name}
-                value={field.state.value}
-                onBlur={field.handleBlur}
-                onChange={(e) => field.handleChange(e.target.value)}
-                aria-invalid={isInvalid}
-                placeholder="Enter your password"
-                autoComplete="off"
-              />
-              {isInvalid && (
-                <FieldError errors={field.state.meta.errors} />
-              )}
-            </Field>
-          )
-        }}
-      />
-      <Field>
-        <Button type="submit">Login</Button>
-      </Field>
+      <LoginForm form={form} />
       <FieldSeparator>Or continue with</FieldSeparator>
       <Field>
         <Button variant="outline" type="button">
