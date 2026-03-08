@@ -6,9 +6,9 @@ import {
 } from '@tanstack/react-query'
 import { authClient } from '#/lib/auth-client'
 import type {
-  UpdateEmailInput,
-  UpdatePasswordInput,
-  UpdateProfileInput
+  UpdateEmailValues,
+  UpdatePasswordValues,
+  UpdateProfileValues
 } from './schema'
 import { getContext } from '#/integrations/tanstack-query/root-provider'
 
@@ -17,7 +17,7 @@ const queryKey = (...keys: string[]) => ['account', ...keys]
 export const useAccountUpdateProfile = () => {
   const router = useRouter()
   const action = useMutation({
-    mutationFn: async (body: UpdateProfileInput) => {
+    mutationFn: async (body: UpdateProfileValues) => {
       const response = await authClient.updateUser({
         name: body.name,
         image: body.avatarUrl,
@@ -30,7 +30,7 @@ export const useAccountUpdateProfile = () => {
   })
   return {
     isLoading: action.isPending,
-    updateProfile: (body: UpdateProfileInput) => toast.promise(action.mutateAsync(body), {
+    updateProfile: (body: UpdateProfileValues) => toast.promise(action.mutateAsync(body), {
       loading: 'Updating profile...',
       success: () => {
         router.invalidate()
@@ -44,7 +44,7 @@ export const useAccountUpdateProfile = () => {
 export const useAccountUpdateEmail = () => {
   const router = useRouter()
   const action = useMutation({
-    mutationFn: async (body: UpdateEmailInput) => {
+    mutationFn: async (body: UpdateEmailValues) => {
       const response = await authClient.changeEmail({
         newEmail: body.email,
       })
@@ -56,7 +56,7 @@ export const useAccountUpdateEmail = () => {
   })
   return {
     isLoading: action.isPending,
-    updateEmail: (body: UpdateEmailInput) => toast.promise(action.mutateAsync(body), {
+    updateEmail: (body: UpdateEmailValues) => toast.promise(action.mutateAsync(body), {
       loading: 'Updating email...',
       success: () => {
         router.invalidate()
@@ -70,7 +70,7 @@ export const useAccountUpdateEmail = () => {
 export const useAccountUpdatePassword = () => {
   const router = useRouter()
   const action = useMutation({
-    mutationFn: async (body: UpdatePasswordInput) => {
+    mutationFn: async (body: UpdatePasswordValues) => {
       const response = await authClient.changePassword({
         currentPassword: body.currentPassword,
         newPassword: body.newPassword,
@@ -83,7 +83,7 @@ export const useAccountUpdatePassword = () => {
   })
   return {
     isLoading: action.isPending,
-    updatePassword: (body: UpdatePasswordInput) => toast.promise(action.mutateAsync(body), {
+    updatePassword: (body: UpdatePasswordValues) => toast.promise(action.mutateAsync(body), {
       loading: 'Updating password...',
       success: () => {
         router.invalidate()
