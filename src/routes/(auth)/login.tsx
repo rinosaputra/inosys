@@ -113,7 +113,7 @@ const LoginForm = withForm({
 function LoginPage() {
   const form = useAppForm({
     ...loginFormOptions,
-    onSubmit({ value }) {
+    onSubmit({ value, formApi }) {
       toast.promise(
         async () => {
           const response = await authClient.signIn.email({
@@ -132,6 +132,7 @@ function LoginPage() {
             return "Login successful!"
           },
           error: e => {
+            formApi.reset()
             return e instanceof Error ? e.message : "An error occurred during login."
           },
         }
