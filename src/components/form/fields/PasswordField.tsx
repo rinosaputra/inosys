@@ -9,7 +9,7 @@ import {
 } from '#/components/ui/field'
 import { PasswordInput } from '#/components/password'
 
-type TextFieldProps = {
+type PasswordFieldProps = {
   label: string
   description?: React.ReactNode
   placeholder?: string
@@ -20,11 +20,11 @@ type TextFieldProps = {
   'value' | 'defaultValue' | 'onChange' | 'onBlur'
 >
 
-export function TextField({
+export function PasswordField({
   label,
   description,
   ...props
-}: TextFieldProps) {
+}: PasswordFieldProps) {
   const field = useFieldContext<string>()
 
   const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid
