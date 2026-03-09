@@ -1,6 +1,6 @@
 import type { LucideIcon } from "lucide-react"
 
-import { useFormContext } from "../form-context"
+import { useFormContext } from '#/integrations/tanstack-form/form-context'
 
 import { Button } from "#/components/ui/button"
 import { Spinner } from "#/components/ui/spinner"
