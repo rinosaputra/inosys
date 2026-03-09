@@ -2,16 +2,16 @@ import { createFormHook } from '@tanstack/react-form'
 
 import { fieldContext, formContext } from './form-context'
 
-import { TextField } from './fields/TextField'
-import { TextareaField } from './fields/TextareaField'
-import { SelectField } from './fields/SelectField'
-import { CheckboxField } from './fields/CheckboxField'
-import { MultipleCheckboxField } from './fields/MultipleCheckboxField'
-import { RadioGroupField } from './fields/RadioGroupField'
-import { SwitchField } from './fields/SwitchField'
+import { TextField } from '#/components/form/fields/TextField'
+import { TextareaField } from '#/components/form/fields/TextareaField'
+import { SelectField } from '#/components/form/fields/SelectField'
+import { CheckboxField } from '#/components/form/fields/CheckboxField'
+import { MultipleCheckboxField } from '#/components/form/fields/MultipleCheckboxField'
+import { RadioGroupField } from '#/components/form/fields/RadioGroupField'
+import { SwitchField } from '#/components/form/fields/SwitchField'
 
-import { SubmitForm } from './forms/SubmitForm'
-import { ResetForm } from './forms/ResetForm'
+import { SubmitForm } from '#/components/form/forms/SubmitForm'
+import { ResetForm } from '#/components/form/forms/ResetForm'
 
 export const { useAppForm, withForm } = createFormHook({
   fieldContext,

@@ -1,6 +1,6 @@
-import { useFieldContext } from '../form-context'
+import { useFieldContext } from '#/integrations/tanstack-form/form-context'
 
-import { Textarea } from '#/components/ui/textarea'
+import { Input } from '#/components/ui/input'
 import {
   Field,
   FieldContent,
@@ -9,20 +9,22 @@ import {
   FieldLabel,
 } from '#/components/ui/field'
 
-type TextareaFieldProps = {
+type TextFieldProps = {
   label: string
   description?: React.ReactNode
   placeholder?: string
+  autoComplete?: string
+  inputMode?: React.HTMLAttributes<HTMLInputElement>['inputMode']
 } & Omit<
-  React.ComponentProps<typeof Textarea>,
+  React.ComponentProps<typeof Input>,
   'value' | 'defaultValue' | 'onChange' | 'onBlur'
 >
 
-export function TextareaField({
+export function TextField({
   label,
   description,
   ...props
-}: TextareaFieldProps) {
+}: TextFieldProps) {
   const field = useFieldContext<string>()
 
   const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid
@@ -32,7 +34,7 @@ export function TextareaField({
       <FieldLabel htmlFor={field.name}>{label}</FieldLabel>
 
       <FieldContent>
-        <Textarea
+        <Input
           {...props}
           name={field.name}
           value={field.state.value ?? ''}
@@ -43,6 +45,8 @@ export function TextareaField({
 
         {description ? <FieldDescription>{description}</FieldDescription> : null}
 
+        {/* TanStack Form error shape can vary (string, object, etc).
+            Our FieldError accepts an array of { message?: string }, so we normalize. */}
         <FieldError
           errors={field.state.meta.errors?.map((e) => ({
             message: typeof e === 'string' ? e : (e as any)?.message,
