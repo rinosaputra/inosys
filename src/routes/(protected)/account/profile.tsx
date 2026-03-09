@@ -3,7 +3,6 @@ import { formOptions } from '@tanstack/react-form'
 
 import { createMeta, type CreateMetaInput } from '#/lib/seo'
 
-import { useAppForm, withForm } from '#/integrations/tanstack-form/form-hook'
 import {
   Field,
   FieldGroup,
@@ -13,6 +12,7 @@ import { Separator } from '#/components/ui/separator'
 
 import { UpdateProfileSchema, type UpdateProfileValues } from './-components/schema'
 import { useAccountUpdateProfile } from './-components/hook'
+import { useAppFormAccount, withFormAccount } from './-components/form-hook'
 
 const metadata: CreateMetaInput = {
   title: 'Profile Settings',
@@ -34,7 +34,7 @@ const formOpts = formOptions({
   defaultValues,
 })
 
-const Form = withForm({
+const Form = withFormAccount({
   ...formOpts,
   render: ({ form }) => <form
     className="mt-5 flex flex-col gap-6"
@@ -92,7 +92,7 @@ function AccountProfilePage() {
   const { auth: { user } } = Route.useRouteContext()
   const { updateProfile } = useAccountUpdateProfile()
 
-  const form = useAppForm({
+  const form = useAppFormAccount({
     ...formOpts,
     defaultValues: {
       name: user.name ?? '',

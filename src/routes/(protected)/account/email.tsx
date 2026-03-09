@@ -3,7 +3,6 @@ import { formOptions } from '@tanstack/react-form'
 
 import { createMeta, type CreateMetaInput } from '#/lib/seo'
 
-import { useAppForm, withForm } from '#/integrations/tanstack-form/form-hook'
 import {
   Field,
   FieldGroup,
@@ -13,6 +12,7 @@ import { Separator } from '#/components/ui/separator'
 
 import { UpdateEmailSchema, type UpdateEmailValues } from './-components/schema'
 import { useAccountUpdateEmail } from './-components/hook'
+import { useAppFormAccount, withFormAccount } from './-components/form-hook'
 
 const metadata: CreateMetaInput = {
   title: 'Email Settings',
@@ -33,7 +33,7 @@ const formOpts = formOptions({
   defaultValues,
 })
 
-const Form = withForm({
+const Form = withFormAccount({
   ...formOpts,
   render: ({ form }) => <form
     className="mt-5 flex flex-col gap-6"
@@ -82,7 +82,7 @@ function AccountEmailPage() {
   const { auth } = Route.useRouteContext()
   const { updateEmail } = useAccountUpdateEmail()
 
-  const form = useAppForm({
+  const form = useAppFormAccount({
     ...formOpts,
     defaultValues: {
       email: auth?.user?.email ?? '',

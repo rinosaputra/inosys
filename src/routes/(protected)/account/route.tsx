@@ -1,6 +1,7 @@
-import { createFileRoute, Link, Outlet } from '@tanstack/react-router'
+import { createFileRoute, Link, Outlet, useLocation } from '@tanstack/react-router'
 import { ACCOUNT_URLs } from './-components/urls';
 import type { CreateMetaInput } from '#/lib/seo';
+import { Button } from '#/components/ui/button';
 
 const metadata: CreateMetaInput = {
   title: 'Account Settings',
@@ -12,6 +13,8 @@ export const Route = createFileRoute('/(protected)/account')({
 })
 
 function AccountLayout() {
+  const { pathname } = useLocation()
+
   return (
     <div className="flex flex-1 flex-col">
       <div className="@container/main flex flex-1 flex-col gap-2">
@@ -19,7 +22,6 @@ function AccountLayout() {
 
           <section className="p-6 sm:p-8">
             <div className="mb-6">
-              <p className="island-kicker mb-2">Account</p>
               <h1 className="display-title m-0 text-3xl font-bold tracking-tight sm:text-4xl">
                 {metadata.title}
               </h1>
@@ -29,23 +31,28 @@ function AccountLayout() {
             </div>
 
             <div className="grid gap-6 lg:grid-cols-[240px_1fr]">
-              <aside className="island-shell rounded-2xl p-4">
-                <nav className="flex flex-col gap-1">
-                  {ACCOUNT_URLs.map((account, index) => (<Link
-                    key={index}
-                    to={account.url}
-                    className="rounded-xl px-3 py-2 text-sm font-semibold no-underline transition"
-                    activeProps={{
-                      className:
-                        'rounded-xl px-3 py-2 text-sm font-semibold no-underline',
-                    }}
-                  >
-                    {account.label}
-                  </Link>))}
+              <aside className="island-shell rounded-2xl">
+                <nav className="flex flex-row lg:flex-col gap-1">
+                  {ACCOUNT_URLs.map((account, index) => {
+                    const isActive = pathname.startsWith(account.url)
+                    return (<Button
+                      asChild
+                      variant={isActive ? 'default' : 'ghost'}
+                      size="sm"
+                      key={index}
+                    >
+                      <Link
+                        to={account.url}
+                        className="text-left"
+                      >
+                        {account.label}
+                      </Link>
+                    </Button>)
+                  })}
                 </nav>
               </aside>
 
-              <section className="island-shell rounded-2xl p-5 sm:p-6">
+              <section className="island-shell rounded-2xl">
                 <Outlet />
               </section>
             </div>

@@ -3,12 +3,9 @@ import { formOptions } from '@tanstack/react-form'
 
 import { createMeta, type CreateMetaInput } from '#/lib/seo'
 
-import { useAppForm, withForm } from '#/integrations/tanstack-form/form-hook'
 import {
   Field,
-  FieldError,
   FieldGroup,
-  FieldLabel,
   FieldSeparator,
 } from '#/components/ui/field'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '#/components/ui/card'
@@ -16,7 +13,7 @@ import { Separator } from '#/components/ui/separator'
 
 import { UpdatePasswordSchema, type UpdatePasswordValues } from './-components/schema'
 import { useAccountUpdatePassword } from './-components/hook'
-import { PasswordInput } from '#/components/password'
+import { useAppFormAccount, withFormAccount } from './-components/form-hook'
 
 const metadata: CreateMetaInput = {
   title: 'Password Settings',
@@ -39,7 +36,7 @@ const formOpts = formOptions({
   defaultValues,
 })
 
-const Form = withForm({
+const Form = withFormAccount({
   ...formOpts,
   render: ({ form }) => <form
     className="mt-5 flex flex-col gap-6"
@@ -58,84 +55,36 @@ const Form = withForm({
       <Separator />
       <CardContent>
         <FieldGroup>
-          <form.Field
-            name="currentPassword"
-            children={(field) => {
-              const isInvalid =
-                field.state.meta.isTouched && !field.state.meta.isValid
-              return (
-                <Field data-invalid={isInvalid}>
-                  <FieldLabel htmlFor={field.name}>Current password</FieldLabel>
-                  <PasswordInput
-                    id={field.name}
-                    name={field.name}
-                    value={field.state.value}
-                    onBlur={field.handleBlur}
-                    onChange={(e) => field.handleChange(e.target.value)}
-                    aria-invalid={isInvalid}
-                    placeholder="Enter current password"
-                    autoComplete="current-password"
-                  />
-                  {isInvalid && <FieldError errors={field.state.meta.errors} />}
-                </Field>
-              )
-            }}
-          />
+          {/* Current Password Field */}
+          <form.AppField name="currentPassword">
+            {({ PasswordField }) => <PasswordField
+              label="Current Password"
+              placeholder="Enter current password"
+              autoComplete="current-password"
+            />}
+          </form.AppField>
 
           <FieldSeparator>New password</FieldSeparator>
 
-          <form.Field
-            name="newPassword"
-            children={(field) => {
-              const isInvalid =
-                field.state.meta.isTouched && !field.state.meta.isValid
-              return (
-                <Field data-invalid={isInvalid}>
-                  <FieldLabel htmlFor={field.name}>New password</FieldLabel>
-                  <PasswordInput
-                    id={field.name}
-                    name={field.name}
-                    value={field.state.value}
-                    onBlur={field.handleBlur}
-                    onChange={(e) => field.handleChange(e.target.value)}
-                    aria-invalid={isInvalid}
-                    placeholder="Enter new password"
-                    autoComplete="new-password"
-                    showStrength
-                    showStrengthFeedback
-                  />
-                  {isInvalid && <FieldError errors={field.state.meta.errors} />}
-                </Field>
-              )
-            }}
-          />
+          {/* New Password Field */}
+          <form.AppField name="newPassword">
+            {({ PasswordField }) => <PasswordField
+              label="New Password"
+              placeholder="Enter new password"
+              autoComplete="new-password"
+              showStrength
+              showStrengthFeedback
+            />}
+          </form.AppField>
 
-          <form.Field
-            name="confirmNewPassword"
-            children={(field) => {
-              const isInvalid =
-                field.state.meta.isTouched && !field.state.meta.isValid
-              return (
-                <Field data-invalid={isInvalid}>
-                  <FieldLabel htmlFor={field.name}>
-                    Confirm new password
-                  </FieldLabel>
-                  <PasswordInput
-                    id={field.name}
-                    name={field.name}
-                    value={field.state.value}
-                    onBlur={field.handleBlur}
-                    onChange={(e) => field.handleChange(e.target.value)}
-                    aria-invalid={isInvalid}
-                    placeholder="Confirm new password"
-                    autoComplete="new-password"
-                  />
-                  {isInvalid && <FieldError errors={field.state.meta.errors} />}
-                </Field>
-              )
-            }}
-          />
-
+          {/* Confirm New Password Field */}
+          <form.AppField name="confirmNewPassword">
+            {({ PasswordField }) => <PasswordField
+              label="Confirm New Password"
+              placeholder="Confirm new password"
+              autoComplete="new-password"
+            />}
+          </form.AppField>
         </FieldGroup>
       </CardContent>
       <Separator />
@@ -155,7 +104,7 @@ const Form = withForm({
 
 function AccountPasswordPage() {
   const { updatePassword } = useAccountUpdatePassword()
-  const form = useAppForm({
+  const form = useAppFormAccount({
     validators: { onSubmit: UpdatePasswordSchema },
     defaultValues: {
       currentPassword: '',

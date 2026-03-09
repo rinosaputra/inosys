@@ -1,5 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router'
-import { Link } from 'lucide-react'
+import { createFileRoute, Link } from '@tanstack/react-router'
 
 import { createMeta, type CreateMetaInput } from '#/lib/seo';
 
